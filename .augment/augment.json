@@ -1,0 +1,63 @@
+{
+    "project": "WealthTrackr",
+    "language": "TypeScript, Python",
+    "frameworks": ["Vite", "React", "FastAPI", "SQLAlchemy"],
+    "uiLibrary": "shadcn/ui",
+    "codingStandards": {
+      "architecture": "Loosely coupled: UI → API → Service → ORM → Database",
+      "testing": "Follow TDD; implement unit and integration tests after each layer",
+      "dataFlow": "Use mocked/dummy data in service layer until database integration is complete"
+    },
+    "generationGuidelines": {
+      "Project Tracking": [
+        "Each feature defined in requirements/requirements.md must be written to a file named requirements.json with a Yes/No flag for its completion status.",
+        "Each feature must be tracked in a separate JSON file under a `requirements/features/` folder. Example: `features/track_transactions.json`.",
+        "Each feature JSON file must contain: feature name, an acceptance criteria, a completion status flag, and an array of user stories, and each story must contain a title, acceptance criteria, an array of tasks, and a status flag (Yes/No).",
+        "Each task must also contain a Yes/No completion_status flag to track progress. When all the tasks are completed, validate user story acceptance criteria and update the user story’s completion_status to 'Yes'.",
+        "Update the feature’s completion_status to 'Yes' when all its user stories and their tasks are marked complete. Validate the feature’s acceptance criteria.",
+        "Use a consistent structure when writing JSON tracking files. Treat these files as a project control ledger.",
+        "Do not proceed to the next user story until the current one is implemented and marked complete."
+        ],  
+      "Folder Structure": [
+        "Get my approval before creating any new folders under C:/projects/WealthTrackr/backend and subfolders under it.",
+        "Do not create any new folders directly under main project folder C:/projects/WealthTrackr"
+      ],  
+      "Frontend": [
+        "Use Vite for the frontend with React and shadcn/ui for components.",
+        "Use useContext + useReducer for state management.",
+        "Keep business logic outside of UI components."
+      ],
+      "Development Process": [
+        "Break down each feature into user stories.",
+        "Implement and test one user story at a time before moving on.",
+        "Build one layer at a time: UI → API → Service → ORM → Database.",
+        "Use dummy data returned from the Service layer until real data is wired in."
+      ],
+      "Backend Architecture": [
+        "Maintain clear separation between API, Service, and ORM layers.",
+        "FastAPI routers must delegate to the Service layer; avoid logic in routers.",
+        "Service methods should return dummy data initially for UI development.",
+        "Replace dummy logic with real ORM + DB access once validated."
+      ],
+      "Testing": [
+        "Each file must include unit tests (Pytest for backend, Jest for frontend).",
+        "Write integration tests where applicable.",
+        "Include type annotations and docstrings in all Python functions."
+      ],
+      "Database Change Management": [
+        "Database change scripts must be created in a dedicated folder (e.g., databaseb/migrations).",
+        "Each change script must be prefixed with a numeric sequence (e.g., 001_create_accounts_table.sql).",
+        "For every change script, a rollback script with the same sequence and `_rollback.sql` suffix must be created.",
+        "Use SQLAlchemy to auto-generate schema in models, but maintain manual .sql scripts for migration control."
+      ]
+    },
+    "documentationLinks": [
+      "./docs/data-model.md",
+      "./docs/api-spec.md",
+      "https://vitejs.dev/guide/",
+      "https://ui.shadcn.com/",
+      "https://fastapi.tiangolo.com/",
+      "https://sqlalchemy.org/"
+    ]
+  }
+  

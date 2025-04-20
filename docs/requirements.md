@@ -1,0 +1,17 @@
+# WealthTrackr - Feature Requirements
+
+This document outlines the high-level features planned for the WealthTrackr application. Each feature will be broken into user stories and tasks and tracked separately.
+
+---
+
+## 1. Account Management
+- Add and manage multiple account types: checking, savings, credit card, cash, and investments.
+- Categorize by account type and institution.
+- Track balances and sync with bank APIs (future integration with Plaid or manual import).
+
+## 2. Track Transactions
+- Import and view transactions
+- Categorize transactions
+- Edit and delete entries
+- Filter and search
+
