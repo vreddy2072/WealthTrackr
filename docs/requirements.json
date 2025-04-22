@@ -1,10 +1,9 @@
 [
-    { "feature": "Account Management", "priority": "1", "completion_status": "No" },  
+    { "feature": "Account Management", "priority": "1", "completion_status": "Yes" },
     { "feature": "Track Transactions", "priority": "2", "completion_status": "No" },
     { "feature": "Reports & Dashboard", "priority": "3", "completion_status": "No" },
     { "feature": "Spending Plan", "priority": "4", "completion_status": "No" },
     { "feature": "Savings Goals", "priority": "5", "completion_status": "No" },
     { "feature": "Refund Tracker", "priority": "6", "completion_status": "No" }
-    
+
   ]
-  
