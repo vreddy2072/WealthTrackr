@@ -1,16 +1,67 @@
 {
     "feature": "Track Transactions",
-    "acceptane_criteria": "",
-    "completion_status": "No",
+    "acceptance_criteria": "Users can view, add, edit, and delete transactions. Transactions can be imported, categorized, searched, filtered, and sorted.",
+    "completion_status": "Yes",
     "user_stories": [
       {
-        "title": "",
-        "acceptane_criteria": "",
-        "completion_status": "No",
+        "title": "View Transactions",
+        "acceptance_criteria": "Users can view all transactions and filter them by account, date range, and category.",
+        "completion_status": "Yes",
         "tasks": [
-          { "task": "", "completion_status": "Yes" }
+          { "task": "Create transaction API models", "completion_status": "Yes" },
+          { "task": "Implement transaction API endpoints for listing and filtering transactions", "completion_status": "Yes" },
+          { "task": "Create transaction service methods for retrieving and filtering transactions", "completion_status": "Yes" },
+          { "task": "Create transaction repository for database operations", "completion_status": "Yes" },
+          { "task": "Create UI components for displaying transactions", "completion_status": "Yes" },
+          { "task": "Implement transaction filtering in UI", "completion_status": "Yes" },
+          { "task": "Write unit tests for API, service, and repository layers", "completion_status": "Yes" }
+        ]
+      },
+      {
+        "title": "Add and Edit Transactions",
+        "acceptance_criteria": "Users can add new transactions and edit existing ones with all required fields.",
+        "completion_status": "Yes",
+        "tasks": [
+          { "task": "Implement transaction API endpoints for creating and updating transactions", "completion_status": "Yes" },
+          { "task": "Create transaction service methods for adding and updating transactions", "completion_status": "Yes" },
+          { "task": "Create UI forms for adding and editing transactions", "completion_status": "Yes" },
+          { "task": "Implement form validation for transaction data", "completion_status": "Yes" },
+          { "task": "Write unit tests for API, service, and repository layers", "completion_status": "Yes" }
+        ]
+      },
+      {
+        "title": "Delete Transactions",
+        "acceptance_criteria": "Users can delete transactions with confirmation.",
+        "completion_status": "Yes",
+        "tasks": [
+          { "task": "Implement transaction API endpoint for deleting transactions", "completion_status": "Yes" },
+          { "task": "Create transaction service method for deleting transactions", "completion_status": "Yes" },
+          { "task": "Implement UI for deleting transactions with confirmation", "completion_status": "Yes" },
+          { "task": "Write unit tests for API, service, and repository layers", "completion_status": "Yes" }
+        ]
+      },
+      {
+        "title": "Import Transactions",
+        "acceptance_criteria": "Users can import transactions from CSV or JSON files.",
+        "completion_status": "Yes",
+        "tasks": [
+          { "task": "Implement API endpoint for importing transactions", "completion_status": "Yes" },
+          { "task": "Create service methods for parsing and validating CSV/JSON data", "completion_status": "Yes" },
+          { "task": "Implement UI for file upload and import", "completion_status": "Yes" },
+          { "task": "Add error handling and validation for imported data", "completion_status": "Yes" },
+          { "task": "Write unit tests for API, service, and repository layers", "completion_status": "Yes" }
+        ]
+      },
+      {
+        "title": "Search and Sort Transactions",
+        "acceptance_criteria": "Users can search transactions by text and sort them by various fields.",
+        "completion_status": "Yes",
+        "tasks": [
+          { "task": "Implement API endpoints for searching and sorting transactions", "completion_status": "Yes" },
+          { "task": "Create service methods for searching and sorting transactions", "completion_status": "Yes" },
+          { "task": "Implement UI for searching and sorting transactions", "completion_status": "Yes" },
+          { "task": "Write unit tests for API, service, and repository layers", "completion_status": "Yes" }
         ]
       }
     ]
 }
-      
