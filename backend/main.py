@@ -4,7 +4,8 @@ Main FastAPI application for WealthTrackr backend.
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.api.account_router import router as account_router
+from api.account_router import router as account_router
+from api.transaction_router import router as transaction_router
 
 # Create the FastAPI application
 app = FastAPI(
@@ -24,6 +25,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(account_router)
+app.include_router(transaction_router)
 
 @app.get("/")
 async def root():

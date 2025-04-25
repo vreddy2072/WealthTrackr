@@ -7,7 +7,7 @@ from typing import List, Dict, Any, Optional
 from fastapi import APIRouter, HTTPException, Path, Query, Body
 from pydantic import BaseModel, Field
 
-from backend.service.account_service import AccountService
+from service.account_service import AccountService
 
 # Initialize the router
 router = APIRouter(prefix="/api/accounts", tags=["accounts"])
@@ -103,7 +103,7 @@ async def update_account(
     """
     # Filter out None values
     update_data = {k: v for k, v in account_data.dict().items() if v is not None}
-    
+
     updated_account = account_service.update_account(account_id, update_data)
     if not updated_account:
         raise HTTPException(status_code=404, detail=f"Account with ID {account_id} not found")

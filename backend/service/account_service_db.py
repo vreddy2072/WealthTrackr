@@ -7,8 +7,8 @@ using the database repository for persistence.
 from typing import List, Dict, Optional, Any
 from sqlalchemy.orm import Session
 
-from database.repositories.account_repository import AccountRepository
-from orm.models import Account, AccountType, Institution
+from backend.database.repositories.account_repository import AccountRepository
+from backend.database.models.account import Account, AccountType, Institution
 
 class AccountServiceDB:
     """Service for managing financial accounts using database persistence."""
