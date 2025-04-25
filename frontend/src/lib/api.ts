@@ -5,6 +5,26 @@
 const API_BASE_URL = 'http://localhost:8000/api';
 
 /**
+ * Transaction interface
+ */
+export interface Transaction {
+  id: string;
+  account_id: string;
+  date: string;
+  amount: number;
+  payee: string;
+  category: string;
+  description: string;
+  is_reconciled: boolean;
+  created_at: string;
+  updated_at: string;
+  // Frontend-specific fields
+  accountName?: string;
+  accountId?: string;
+  isReconciled?: boolean;
+}
+
+/**
  * Account type definition
  */
 export interface Account {
@@ -60,6 +80,126 @@ export interface AccountUpdateData {
   notes?: string;
   is_active?: boolean;
 }
+
+/**
+ * API client for transactions
+ */
+export const transactionsApi = {
+  /**
+   * Get all transactions
+   */
+  getAll: async (): Promise<Transaction[]> => {
+    const response = await fetch(`${API_BASE_URL}/transactions/`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch transactions: ${response.statusText}`);
+    }
+    const data = await response.json();
+
+    // Map backend field names to frontend field names if needed
+    return data.map((transaction: any) => ({
+      ...transaction,
+      accountId: transaction.account_id,
+      isReconciled: transaction.is_reconciled
+    }));
+  },
+
+  /**
+   * Get a specific transaction by ID
+   */
+  getById: async (id: string): Promise<Transaction> => {
+    const response = await fetch(`${API_BASE_URL}/transactions/${id}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch transaction: ${response.statusText}`);
+    }
+    const data = await response.json();
+    return {
+      ...data,
+      accountId: data.account_id,
+      isReconciled: data.is_reconciled
+    };
+  },
+
+  /**
+   * Create a new transaction
+   */
+  create: async (transactionData: any): Promise<Transaction> => {
+    // Convert frontend field names to backend field names
+    const apiData = {
+      ...transactionData,
+      account_id: transactionData.accountId,
+      is_reconciled: transactionData.isReconciled
+    };
+
+    const response = await fetch(`${API_BASE_URL}/transactions/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(apiData),
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to create transaction: ${response.statusText}`);
+    }
+    const data = await response.json();
+    return {
+      ...data,
+      accountId: data.account_id,
+      isReconciled: data.is_reconciled
+    };
+  },
+
+  /**
+   * Update an existing transaction
+   */
+  update: async (id: string, transactionData: any): Promise<Transaction> => {
+    // Convert frontend field names to backend field names
+    const apiData = {
+      ...transactionData
+    };
+    if (transactionData.accountId) apiData.account_id = transactionData.accountId;
+    if (transactionData.isReconciled !== undefined) apiData.is_reconciled = transactionData.isReconciled;
+
+    const response = await fetch(`${API_BASE_URL}/transactions/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(apiData),
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to update transaction: ${response.statusText}`);
+    }
+    const data = await response.json();
+    return {
+      ...data,
+      accountId: data.account_id,
+      isReconciled: data.is_reconciled
+    };
+  },
+
+  /**
+   * Delete a transaction
+   */
+  delete: async (id: string): Promise<void> => {
+    const response = await fetch(`${API_BASE_URL}/transactions/${id}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to delete transaction: ${response.statusText}`);
+    }
+  },
+
+  /**
+   * Get all categories
+   */
+  getCategories: async (): Promise<string[]> => {
+    const response = await fetch(`${API_BASE_URL}/transactions/categories`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch categories: ${response.statusText}`);
+    }
+    return response.json();
+  },
+};
 
 /**
  * API client for accounts

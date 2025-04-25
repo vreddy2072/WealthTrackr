@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AccountProvider } from '../lib/contexts/AccountContext';
 import AccountList from '../components/accounts/AccountList';
 import AccountForm from '../components/accounts/AccountForm';
@@ -47,6 +47,11 @@ const AccountsPage: React.FC = () => {
     setCurrentView(AccountView.LIST);
     setSelectedAccountId(undefined);
   };
+
+  // Add debugging for AccountsPage
+  useEffect(() => {
+    console.log('AccountsPage mounted');
+  }, []);
 
   return (
     <AccountProvider>

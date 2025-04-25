@@ -84,9 +84,12 @@ export const AccountProvider: React.FC<{ children: ReactNode }> = ({ children })
   const fetchAccounts = async () => {
     dispatch({ type: 'FETCH_ACCOUNTS_REQUEST' });
     try {
+      console.log('Fetching accounts from API...');
       const accounts = await accountsApi.getAll();
+      console.log('Accounts fetched successfully:', accounts);
       dispatch({ type: 'FETCH_ACCOUNTS_SUCCESS', payload: accounts });
     } catch (error) {
+      console.error('Error fetching accounts:', error);
       dispatch({
         type: 'FETCH_ACCOUNTS_FAILURE',
         payload: error instanceof Error ? error.message : 'An unknown error occurred',
@@ -137,8 +140,14 @@ export const AccountProvider: React.FC<{ children: ReactNode }> = ({ children })
 
   // Load accounts when the component mounts
   useEffect(() => {
+    console.log('AccountContext: Loading accounts on mount');
     fetchAccounts();
   }, []);
+
+  // Debug state changes
+  useEffect(() => {
+    console.log('AccountContext state updated:', state);
+  }, [state]);
 
   return (
     <AccountContext.Provider
