@@ -1,0 +1,13 @@
+-- Create transactions table
+CREATE TABLE IF NOT EXISTS transactions (
+    id VARCHAR(50) PRIMARY KEY,
+    account_id VARCHAR(50) NOT NULL,
+    date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    amount REAL NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    category VARCHAR(100),
+    is_income BOOLEAN NOT NULL DEFAULT 0,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE
+);

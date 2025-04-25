@@ -1,0 +1,3 @@
+-- Update transactions table to add payee and is_reconciled columns
+-- This migration is now a no-op since the columns already exist
+-- Keeping the file for migration history
