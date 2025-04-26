@@ -1,0 +1,9 @@
+{
+  "account_id": "acc-001",
+  "description": "Test Description",
+  "payee": "Test Payee",
+  "amount": -50,
+  "date": "2025-04-23T20:45:22.4890500-04:00",
+  "is_reconciled": false,
+  "category": "Test Category"
+}

@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session, joinedload
 
 from backend.database.models.transaction import Transaction
 from backend.database.models.account import Account
+from backend.service.balance_service import BalanceService
 
 class TransactionRepository:
     """Repository for transaction database operations."""
@@ -137,6 +138,10 @@ class TransactionRepository:
         self.db.commit()
         self.db.refresh(new_transaction)
 
+        # Update the account balance
+        balance_service = BalanceService(self.db)
+        balance_service.update_account_balance(new_transaction.account_id)
+
         return new_transaction
 
     def update_transaction(self, transaction_id: str, transaction_data: Dict[str, Any]) -> Optional[Transaction]:
@@ -178,6 +183,14 @@ class TransactionRepository:
         self.db.commit()
         self.db.refresh(transaction)
 
+        # Update the account balance
+        balance_service = BalanceService(self.db)
+        balance_service.update_account_balance(transaction.account_id)
+
+        # If the account was changed, update the old account's balance too
+        if "account_id" in transaction_data and transaction_data["account_id"] != transaction.account_id:
+            balance_service.update_account_balance(transaction_data["account_id"])
+
         return transaction
 
     def delete_transaction(self, transaction_id: str) -> bool:
@@ -194,8 +207,15 @@ class TransactionRepository:
         if not transaction:
             return False
 
+        # Store the account ID before deleting the transaction
+        account_id = transaction.account_id
+
         self.db.delete(transaction)
         self.db.commit()
+
+        # Update the account balance
+        balance_service = BalanceService(self.db)
+        balance_service.update_account_balance(account_id)
 
         return True
 
@@ -210,10 +230,17 @@ class TransactionRepository:
             List[Transaction]: The list of imported transactions.
         """
         imported_transactions = []
+        affected_accounts = set()
 
         for transaction_data in transactions:
             transaction = self.create_transaction(transaction_data)
             imported_transactions.append(transaction)
+            affected_accounts.add(transaction.account_id)
+
+        # Update all affected account balances
+        balance_service = BalanceService(self.db)
+        for account_id in affected_accounts:
+            balance_service.update_account_balance(account_id)
 
         return imported_transactions
 

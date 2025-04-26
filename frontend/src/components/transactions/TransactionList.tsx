@@ -26,23 +26,18 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../ui/alert-dialog';
-// Import format function with a fallback mechanism
-let formatDate: (date: Date | string, format: string) => string;
-try {
-  const dateFns = require('date-fns');
-  formatDate = (date, formatStr) => {
-    try {
-      return dateFns.format(new Date(date), formatStr);
-    } catch (error) {
-      console.error('Error formatting date:', error);
-      return String(date);
-    }
-  };
-} catch (error) {
-  console.error('Error importing date-fns:', error);
-  formatDate = (date) => String(date);
-}
 import { Edit, MoreVertical, Trash2, CheckCircle, XCircle } from 'lucide-react';
+import { format as formatDateFns } from 'date-fns';
+
+// Define a safe format function
+const formatDate = (date: Date | string, formatStr: string): string => {
+  try {
+    return formatDateFns(new Date(date), formatStr);
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return String(date);
+  }
+};
 
 interface Transaction {
   id: string;
@@ -187,43 +182,45 @@ const TransactionList = ({
                     {formatCurrency(transaction.amount)}
                   </TableCell>
                   <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreVertical className="h-4 w-4" />
-                          <span className="sr-only">Open menu</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleEditClick(transaction)}>
-                          <Edit className="mr-2 h-4 w-4" />
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => handleToggleReconciled(transaction.id, transaction.isReconciled)}
-                          className="flex items-center"
-                        >
-                          {transaction.isReconciled ? (
-                            <>
-                              <XCircle className="mr-2 h-4 w-4" />
-                              Mark as Unreconciled
-                            </>
-                          ) : (
-                            <>
-                              <CheckCircle className="mr-2 h-4 w-4" />
-                              Mark as Reconciled
-                            </>
-                          )}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => handleDeleteClick(transaction.id)}
-                          className="text-red-600"
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <div className="flex space-x-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          console.log('Edit button clicked for transaction:', transaction.id);
+                          handleEditClick(transaction);
+                        }}
+                      >
+                        <Edit className="h-4 w-4" />
+                        <span className="sr-only">Edit</span>
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-red-600 hover:text-red-800 hover:bg-red-100"
+                        onClick={() => {
+                          console.log('Delete button clicked for transaction:', transaction.id);
+                          handleDeleteClick(transaction.id);
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        <span className="sr-only">Delete</span>
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className={transaction.isReconciled ? "text-green-600" : "text-gray-400"}
+                        onClick={() => {
+                          console.log('Toggle reconciled clicked for transaction:', transaction.id);
+                          handleToggleReconciled(transaction.id, transaction.isReconciled);
+                        }}
+                      >
+                        {transaction.isReconciled ?
+                          <CheckCircle className="h-4 w-4" /> :
+                          <XCircle className="h-4 w-4" />}
+                        <span className="sr-only">Toggle Reconciled</span>
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}

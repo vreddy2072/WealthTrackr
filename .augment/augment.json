@@ -28,6 +28,7 @@
         "Organize new files into folders rather than directly placing them in frontend or backend folders.",
         "Get my approval before creating any new folders under C:/projects/WealthTrackr/backend and subfolders under it.",
         "Do not create any new folders directly under main project folder C:/projects/WealthTrackr",
+        "Do not create new files directly under C:/projects/WealthTrackr unles it is appropriate.",
         "Never commit screen designs or image assets to the repository. These should be stored in docs/screens/ which is excluded from git."
       ],
       "Frontend": [

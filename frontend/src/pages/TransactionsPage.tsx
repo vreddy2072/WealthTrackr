@@ -6,8 +6,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 import TransactionList from '../components/transactions/TransactionList';
 import TransactionFilters from '../components/transactions/TransactionFilters';
 import AddTransactionDialog from '../components/transactions/AddTransactionDialog';
+import ImportTransactionsDialog from '../components/transactions/ImportTransactionsDialog';
+import ExportTransactionsDialog from '../components/transactions/ExportTransactionsDialog';
 import { PlusCircle, Download, Upload, Search } from 'lucide-react';
-import { fetchTransactions, addTransaction, updateTransaction, deleteTransaction, fetchAccounts, fetchCategories } from '../api/mockApi';
+import { transactionsApi, accountsApi } from '../lib/api';
 
 // Mock data for transactions
 const mockTransactions = [
@@ -107,6 +109,8 @@ const TransactionsPage = () => {
   const [filteredTransactions, setFilteredTransactions] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddTransactionOpen, setIsAddTransactionOpen] = useState(false);
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const [accountsList, setAccountsList] = useState<{id: string, name: string}[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [activeFilters, setActiveFilters] = useState({
@@ -119,27 +123,56 @@ const TransactionsPage = () => {
     isReconciled: null as boolean | null
   });
 
-  // Fetch transactions and accounts from mock API when component mounts
+  // Fetch transactions and accounts from the database when component mounts
   useEffect(() => {
     const loadData = async () => {
       try {
-        console.log('Fetching transactions from mock API...');
-        const transactionData = await fetchTransactions();
-        console.log('Transactions fetched successfully:', transactionData);
-        setTransactions(transactionData);
-        setFilteredTransactions(transactionData);
-
-        console.log('Fetching accounts from mock API...');
-        const accountData = await fetchAccounts();
+        // Fetch accounts first
+        console.log('Fetching accounts from API...');
+        const accountData = await accountsApi.getAll();
         console.log('Accounts fetched successfully:', accountData);
+        const accountsMap = new Map(accountData.map(account => [account.id, account.name]));
         setAccountsList(accountData.map(account => ({ id: account.id, name: account.name })));
 
-        console.log('Fetching categories from mock API...');
-        const categoryData = await fetchCategories();
-        console.log('Categories fetched successfully:', categoryData);
-        setCategories(categoryData);
+        // Then fetch transactions
+        console.log('Fetching transactions from API...');
+        const transactionData = await transactionsApi.getAll();
+        console.log('Transactions fetched successfully:', transactionData);
+
+        // Add account names to transactions
+        const transactionsWithAccountNames = transactionData.map(transaction => ({
+          ...transaction,
+          accountName: accountsMap.get(transaction.accountId) || 'Unknown Account'
+        }));
+
+        setTransactions(transactionsWithAccountNames);
+        setFilteredTransactions(transactionsWithAccountNames);
+
+        // Fetch categories from the API
+        console.log('Fetching categories from API...');
+        try {
+          const categoryData = await transactionsApi.getCategories();
+          console.log('Categories fetched successfully:', categoryData);
+          setCategories(categoryData);
+        } catch (error) {
+          console.error('Error fetching categories:', error);
+          // Fallback to default categories if API fails
+          setCategories([
+            'Groceries',
+            'Transportation',
+            'Dining',
+            'Shopping',
+            'Entertainment',
+            'Utilities',
+            'Housing',
+            'Healthcare',
+            'Income',
+            'Transfer',
+            'Other'
+          ]);
+        }
       } catch (error) {
-        console.error('Error fetching mock data:', error);
+        console.error('Error fetching data:', error);
       }
     };
 
@@ -206,12 +239,32 @@ const TransactionsPage = () => {
     setFilteredTransactions(filtered);
   }, [transactions, searchQuery, activeFilters]);
 
+  // Function to notify the dashboard to refresh
+  const notifyDashboardToRefresh = () => {
+    // Set a flag in localStorage that the dashboard should refresh
+    localStorage.setItem('dashboardShouldRefresh', 'true');
+    // The dashboard will check this flag when it becomes visible
+  };
+
   const handleAddTransaction = async (newTransaction: any) => {
     try {
-      const transaction = await addTransaction(newTransaction);
-      setTransactions([transaction, ...transactions]);
-      setFilteredTransactions([transaction, ...filteredTransactions]);
+      console.log('Adding new transaction:', newTransaction);
+      const transaction = await transactionsApi.create(newTransaction);
+      console.log('Transaction added successfully:', transaction);
+
+      // Add account name to the transaction
+      const accountName = accountsList.find(a => a.id === transaction.accountId)?.name || 'Unknown Account';
+      const transactionWithAccountName = {
+        ...transaction,
+        accountName
+      };
+
+      setTransactions([transactionWithAccountName, ...transactions]);
+      setFilteredTransactions([transactionWithAccountName, ...filteredTransactions]);
       setIsAddTransactionOpen(false);
+
+      // Notify dashboard to refresh
+      notifyDashboardToRefresh();
     } catch (error) {
       console.error('Error adding transaction:', error);
       alert('Failed to add transaction. Please try again.');
@@ -220,10 +273,15 @@ const TransactionsPage = () => {
 
   const handleDeleteTransaction = async (id: string) => {
     try {
-      await deleteTransaction(id);
+      console.log('Deleting transaction:', id);
+      await transactionsApi.delete(id);
+      console.log('Transaction deleted successfully');
       const updatedTransactions = transactions.filter(t => t.id !== id);
       setTransactions(updatedTransactions);
       setFilteredTransactions(filteredTransactions.filter(t => t.id !== id));
+
+      // Notify dashboard to refresh
+      notifyDashboardToRefresh();
     } catch (error) {
       console.error('Error deleting transaction:', error);
       alert('Failed to delete transaction. Please try again.');
@@ -232,10 +290,23 @@ const TransactionsPage = () => {
 
   const handleUpdateTransaction = async (id: string, updatedData: any) => {
     try {
-      const updated = await updateTransaction(id, updatedData);
-      const updatedTransactions = transactions.map(t => t.id === id ? updated : t);
+      console.log('Updating transaction:', id, updatedData);
+      const updated = await transactionsApi.update(id, updatedData);
+      console.log('Transaction updated successfully:', updated);
+
+      // Add account name to the updated transaction
+      const accountName = accountsList.find(a => a.id === updated.accountId)?.name || 'Unknown Account';
+      const updatedWithAccountName = {
+        ...updated,
+        accountName
+      };
+
+      const updatedTransactions = transactions.map(t => t.id === id ? updatedWithAccountName : t);
       setTransactions(updatedTransactions);
-      setFilteredTransactions(filteredTransactions.map(t => t.id === id ? updated : t));
+      setFilteredTransactions(filteredTransactions.map(t => t.id === id ? updatedWithAccountName : t));
+
+      // Notify dashboard to refresh
+      notifyDashboardToRefresh();
     } catch (error) {
       console.error('Error updating transaction:', error);
       alert('Failed to update transaction. Please try again.');
@@ -246,6 +317,35 @@ const TransactionsPage = () => {
     setActiveFilters(filters);
   };
 
+  const handleImportTransactions = async (accountId: string, transactionsToImport: any[]) => {
+    try {
+      console.log(`Importing ${transactionsToImport.length} transactions for account ${accountId}...`);
+
+      // Call the API to import transactions
+      const importedTransactions = await transactionsApi.importTransactions(accountId, transactionsToImport);
+      console.log('Transactions imported successfully:', importedTransactions);
+
+      // Add account name to the imported transactions
+      const accountName = accountsList.find(a => a.id === accountId)?.name || 'Unknown Account';
+      const transactionsWithAccountName = importedTransactions.map(transaction => ({
+        ...transaction,
+        accountName
+      }));
+
+      // Update the transactions state
+      setTransactions([...transactionsWithAccountName, ...transactions]);
+
+      // Notify dashboard to refresh
+      notifyDashboardToRefresh();
+
+      // Show success message
+      alert(`Successfully imported ${importedTransactions.length} transactions.`);
+    } catch (error) {
+      console.error('Error importing transactions:', error);
+      alert('Failed to import transactions. Please try again.');
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -254,7 +354,7 @@ const TransactionsPage = () => {
           <Button
             variant="outline"
             className="flex items-center gap-2"
-            onClick={() => alert('Import feature coming soon!')}
+            onClick={() => setIsImportDialogOpen(true)}
           >
             <Upload size={16} />
             Import
@@ -262,7 +362,7 @@ const TransactionsPage = () => {
           <Button
             variant="outline"
             className="flex items-center gap-2"
-            onClick={() => alert('Export feature coming soon!')}
+            onClick={() => setIsExportDialogOpen(true)}
           >
             <Download size={16} />
             Export
@@ -380,6 +480,20 @@ const TransactionsPage = () => {
         onAdd={handleAddTransaction}
         accounts={accountsList}
         categories={categories}
+      />
+
+      <ImportTransactionsDialog
+        isOpen={isImportDialogOpen}
+        onClose={() => setIsImportDialogOpen(false)}
+        onImport={handleImportTransactions}
+        accounts={accountsList}
+      />
+
+      <ExportTransactionsDialog
+        isOpen={isExportDialogOpen}
+        onClose={() => setIsExportDialogOpen(false)}
+        accounts={accountsList}
+        categories={categories.map(category => ({ name: category }))}
       />
     </div>
   );

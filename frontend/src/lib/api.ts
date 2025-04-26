@@ -25,6 +25,19 @@ export interface Transaction {
 }
 
 /**
+ * Transaction filters interface
+ */
+export interface TransactionFilters {
+  accountId?: string;
+  category?: string;
+  startDate?: Date;
+  endDate?: Date;
+  minAmount?: number;
+  maxAmount?: number;
+  isReconciled?: boolean;
+}
+
+/**
  * Account type definition
  */
 export interface Account {
@@ -199,6 +212,64 @@ export const transactionsApi = {
     }
     return response.json();
   },
+
+  /**
+   * Import transactions from CSV or JSON
+   */
+  importTransactions: async (accountId: string, transactions: any[]): Promise<Transaction[]> => {
+    const apiData = {
+      account_id: accountId,
+      transactions: transactions.map(t => ({
+        ...t,
+        account_id: t.accountId || accountId,
+        is_reconciled: t.isReconciled !== undefined ? t.isReconciled : false
+      }))
+    };
+
+    const response = await fetch(`${API_BASE_URL}/transactions/import`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(apiData),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to import transactions: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.map((transaction: any) => ({
+      ...transaction,
+      accountId: transaction.account_id,
+      isReconciled: transaction.is_reconciled
+    }));
+  },
+
+  /**
+   * Export transactions to CSV or JSON
+   * @param format The export format (csv or json)
+   * @param filters Optional filters to apply
+   * @returns A URL to download the exported file
+   */
+  exportTransactions: async (format: 'csv' | 'json', filters?: TransactionFilters): Promise<string> => {
+    // Build query parameters
+    const params = new URLSearchParams();
+    params.append('format', format);
+
+    if (filters) {
+      if (filters.accountId) params.append('account_id', filters.accountId);
+      if (filters.category) params.append('category', filters.category);
+      if (filters.startDate) params.append('start_date', filters.startDate.toISOString());
+      if (filters.endDate) params.append('end_date', filters.endDate.toISOString());
+      if (filters.minAmount !== undefined) params.append('min_amount', filters.minAmount.toString());
+      if (filters.maxAmount !== undefined) params.append('max_amount', filters.maxAmount.toString());
+      if (filters.isReconciled !== undefined) params.append('is_reconciled', filters.isReconciled.toString());
+    }
+
+    // Return the URL for the download
+    return `${API_BASE_URL}/transactions/export?${params.toString()}`;
+  },
 };
 
 /**
@@ -321,7 +392,7 @@ export const accountsApi = {
    * Get total balance across all accounts
    */
   getTotalBalance: async (): Promise<number> => {
-    const response = await fetch(`${API_BASE_URL}/accounts/summary/total-balance`);
+    const response = await fetch(`${API_BASE_URL}/accounts/stats/total-balance`);
     if (!response.ok) {
       throw new Error(`Failed to fetch total balance: ${response.statusText}`);
     }
@@ -332,7 +403,7 @@ export const accountsApi = {
    * Get net worth (assets minus liabilities)
    */
   getNetWorth: async (): Promise<number> => {
-    const response = await fetch(`${API_BASE_URL}/accounts/summary/net-worth`);
+    const response = await fetch(`${API_BASE_URL}/accounts/stats/net-worth`);
     if (!response.ok) {
       throw new Error(`Failed to fetch net worth: ${response.statusText}`);
     }

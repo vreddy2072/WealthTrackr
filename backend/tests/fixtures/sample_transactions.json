@@ -1,0 +1,37 @@
+[
+  {
+    "date": "2025-04-20",
+    "amount": -125.50,
+    "payee": "Grocery Store",
+    "category": "Groceries",
+    "description": "Weekly grocery shopping"
+  },
+  {
+    "date": "2025-04-21",
+    "amount": -45.00,
+    "payee": "Gas Station",
+    "category": "Transportation",
+    "description": "Fuel for car"
+  },
+  {
+    "date": "2025-04-22",
+    "amount": -15.99,
+    "payee": "Coffee Shop",
+    "category": "Dining",
+    "description": "Morning coffee"
+  },
+  {
+    "date": "2025-04-23",
+    "amount": 1500.00,
+    "payee": "Employer",
+    "category": "Income",
+    "description": "Salary payment"
+  },
+  {
+    "date": "2025-04-24",
+    "amount": -89.99,
+    "payee": "Online Store",
+    "category": "Shopping",
+    "description": "New headphones"
+  }
+]
