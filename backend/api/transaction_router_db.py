@@ -215,7 +215,7 @@ async def search_transactions(query: str = Body(..., embed=True), db: Session = 
     transaction_service = TransactionServiceDB(db)
     return transaction_service.search_transactions(query)
 
-@router.get("/transactions/export")
+@router.get("/export")
 async def export_transactions(
     format: str = Query("csv", description="Export format: csv or json"),
     account_id: Optional[str] = Query(None, description="Filter by account ID"),
