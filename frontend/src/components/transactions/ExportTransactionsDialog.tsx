@@ -4,6 +4,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter
 } from '../ui/dialog';
 import { Button } from '../ui/button';
@@ -42,8 +43,8 @@ const ExportTransactionsDialog = ({
   accounts,
   categories
 }: ExportTransactionsDialogProps) => {
-  const [selectedAccount, setSelectedAccount] = useState<string>('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedAccount, setSelectedAccount] = useState<string>('all-accounts');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all-categories');
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [format, setFormat] = useState<'csv' | 'json'>('csv');
@@ -57,17 +58,17 @@ const ExportTransactionsDialog = ({
 
       // Build filters object
       const filters: any = {};
-      if (selectedAccount) filters.accountId = selectedAccount;
-      if (selectedCategory) filters.category = selectedCategory;
+      if (selectedAccount && selectedAccount !== 'all-accounts') filters.accountId = selectedAccount;
+      if (selectedCategory && selectedCategory !== 'all-categories') filters.category = selectedCategory;
       if (startDate) filters.startDate = startDate;
       if (endDate) filters.endDate = endDate;
 
       // Get the export URL
       const exportUrl = await transactionsApi.exportTransactions(format, filters);
-      
+
       // Open the URL in a new tab to trigger download
       window.open(exportUrl, '_blank');
-      
+
       // Close the dialog
       onClose();
     } catch (error) {
@@ -79,8 +80,8 @@ const ExportTransactionsDialog = ({
   };
 
   const resetForm = () => {
-    setSelectedAccount('');
-    setSelectedCategory('');
+    setSelectedAccount('all-accounts');
+    setSelectedCategory('all-categories');
     setStartDate(undefined);
     setEndDate(undefined);
     setFormat('csv');
@@ -88,8 +89,8 @@ const ExportTransactionsDialog = ({
   };
 
   return (
-    <Dialog 
-      open={isOpen} 
+    <Dialog
+      open={isOpen}
       onOpenChange={(open) => {
         if (!open) {
           resetForm();
@@ -100,6 +101,9 @@ const ExportTransactionsDialog = ({
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Export Transactions</DialogTitle>
+          <DialogDescription>
+            Export your transactions in CSV or JSON format. You can filter by account, category, and date range.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
@@ -116,7 +120,7 @@ const ExportTransactionsDialog = ({
                   <SelectValue placeholder="All Accounts" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Accounts</SelectItem>
+                  <SelectItem value="all-accounts">All Accounts</SelectItem>
                   {accounts.map((account) => (
                     <SelectItem key={account.id} value={account.id}>
                       {account.name}
@@ -140,7 +144,7 @@ const ExportTransactionsDialog = ({
                   <SelectValue placeholder="All Categories" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Categories</SelectItem>
+                  <SelectItem value="all-categories">All Categories</SelectItem>
                   {categories.map((category) => (
                     <SelectItem key={category.name} value={category.name}>
                       {category.name}
@@ -211,8 +215,8 @@ const ExportTransactionsDialog = ({
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button 
-            onClick={handleExport} 
+          <Button
+            onClick={handleExport}
             disabled={isLoading}
             className="flex items-center gap-2"
           >
