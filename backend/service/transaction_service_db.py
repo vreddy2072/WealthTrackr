@@ -148,6 +148,24 @@ class TransactionServiceDB:
         transactions = self.repository.search_transactions(query)
         return [self._transaction_to_dict(transaction) for transaction in transactions]
 
+    def get_categories(self) -> List[str]:
+        """
+        Get all unique transaction categories.
+
+        Returns:
+            List[str]: A list of unique categories.
+        """
+        # Get all transactions
+        transactions = self.repository.get_all_transactions()
+
+        # Extract unique categories
+        categories = set()
+        for transaction in transactions:
+            if transaction.category:
+                categories.add(transaction.category)
+
+        return sorted(list(categories))
+
     def _transaction_to_dict(self, transaction: Transaction) -> Dict[str, Any]:
         """
         Convert a Transaction model to a dictionary.

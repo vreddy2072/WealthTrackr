@@ -18,3 +18,8 @@ This document outlines the high-level features planned for the WealthTrackr appl
 - Manual transaction entry and editing.
 - Search, filter, and sort transactions.
 
+### 3.3 Reports & Dashboards
+- Net worth over time
+- Spending by category/pie chart
+- Monthly summary reports
+- Download reports as PDF/CSV

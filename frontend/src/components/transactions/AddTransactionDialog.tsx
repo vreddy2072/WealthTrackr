@@ -11,6 +11,7 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Checkbox } from '../ui/checkbox';
+import { format } from 'date-fns';
 // Helper function to format dates without relying on date-fns
 const formatDateForInput = (date: Date): string => {
   try {

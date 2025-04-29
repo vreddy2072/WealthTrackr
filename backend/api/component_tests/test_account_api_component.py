@@ -44,8 +44,8 @@ from backend.database.models.account import AccountType, Institution, Account
 # Create a test client
 client = TestClient(app)
 
-# Use in-memory SQLite database for testing
-TEST_DB_URL = "sqlite:///:memory:"
+# Use in-memory SQLite database for testing with thread checking disabled
+TEST_DB_URL = "sqlite:///:memory:?check_same_thread=False"
 
 
 class TestAccountAPIComponent:
@@ -55,6 +55,7 @@ class TestAccountAPIComponent:
     def db_engine(self):
         """Create a test database engine."""
         engine = create_engine(TEST_DB_URL)
+        # Create all tables
         Base.metadata.create_all(engine)
 
         yield engine
@@ -326,7 +327,7 @@ class TestAccountAPIComponent:
 
     def test_get_total_balance(self, db_session):
         """Test getting the total balance."""
-        response = client.get("/api/accounts/summary/total-balance")
+        response = client.get("/api/accounts/stats/total-balance")
 
         assert response.status_code == 200
         total_balance = response.json()
@@ -335,7 +336,7 @@ class TestAccountAPIComponent:
 
     def test_get_net_worth(self, db_session):
         """Test getting the net worth."""
-        response = client.get("/api/accounts/summary/net-worth")
+        response = client.get("/api/accounts/stats/net-worth")
 
         assert response.status_code == 200
         net_worth = response.json()

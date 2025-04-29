@@ -1,6 +1,6 @@
 {
     "feature": "Track Transactions",
-    "acceptance_criteria": "Users can view, add, edit, and delete transactions. Transactions can be imported, categorized, searched, filtered, and sorted.",
+    "acceptance_criteria": "Users can view, add, edit, and delete transactions. Transactions can be imported, exported, categorized, searched, filtered, and sorted.",
     "completion_status": "Yes",
     "user_stories": [
       {
@@ -49,6 +49,18 @@
           { "task": "Create service methods for parsing and validating CSV/JSON data", "completion_status": "Yes" },
           { "task": "Implement UI for file upload and import", "completion_status": "Yes" },
           { "task": "Add error handling and validation for imported data", "completion_status": "Yes" },
+          { "task": "Write unit tests for API, service, and repository layers", "completion_status": "Yes" }
+        ]
+      },
+      {
+        "title": "Export Transactions",
+        "acceptance_criteria": "Users can export transactions to CSV or JSON files.",
+        "completion_status": "Yes",
+        "tasks": [
+          { "task": "Implement API endpoint for exporting transactions", "completion_status": "Yes" },
+          { "task": "Create service methods for generating CSV/JSON data", "completion_status": "Yes" },
+          { "task": "Implement UI for selecting export format and filters", "completion_status": "Yes" },
+          { "task": "Add file download functionality", "completion_status": "Yes" },
           { "task": "Write unit tests for API, service, and repository layers", "completion_status": "Yes" }
         ]
       },
