@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 # Import database routers instead of mock routers
 from backend.api.account_router_db import router as account_router
 from backend.api.transaction_router_db import router as transaction_router
+from backend.api.export_router import router as export_router
 from backend.database.scripts.init_db import init_db
 from backend.database.migrations.manager import run_migrations
 
@@ -35,6 +36,7 @@ app.add_middleware(
 # Include routers
 app.include_router(account_router)
 app.include_router(transaction_router)
+app.include_router(export_router)
 
 @app.get("/")
 async def root():

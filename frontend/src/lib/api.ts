@@ -268,7 +268,7 @@ export const transactionsApi = {
     }
 
     // Return the URL for the download
-    return `${API_BASE_URL}/transactions/export?${params.toString()}`;
+    return `${API_BASE_URL}/export/transactions?${params.toString()}`;
   },
 };
 
