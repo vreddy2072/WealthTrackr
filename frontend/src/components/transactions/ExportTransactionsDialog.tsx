@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '../ui/select';
-import { DatePicker } from '../ui/date-picker';
+import { Input } from '../ui/input';
 import { Alert, AlertDescription } from '../ui/alert';
 import { AlertCircle, Download } from 'lucide-react';
 import { transactionsApi } from '../../lib/api';
@@ -160,10 +160,12 @@ const ExportTransactionsDialog = ({
               Start Date
             </Label>
             <div className="col-span-3">
-              <DatePicker
-                date={startDate}
-                setDate={setStartDate}
-                placeholder="Select start date"
+              <Input
+                id="startDate"
+                type="date"
+                value={startDate ? startDate.toISOString().split('T')[0] : ''}
+                onChange={(e) => setStartDate(e.target.value ? new Date(e.target.value) : undefined)}
+                className="w-full"
               />
             </div>
           </div>
@@ -173,10 +175,12 @@ const ExportTransactionsDialog = ({
               End Date
             </Label>
             <div className="col-span-3">
-              <DatePicker
-                date={endDate}
-                setDate={setEndDate}
-                placeholder="Select end date"
+              <Input
+                id="endDate"
+                type="date"
+                value={endDate ? endDate.toISOString().split('T')[0] : ''}
+                onChange={(e) => setEndDate(e.target.value ? new Date(e.target.value) : undefined)}
+                className="w-full"
               />
             </div>
           </div>
