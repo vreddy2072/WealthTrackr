@@ -14,8 +14,7 @@ from sqlalchemy.orm import Session
 from backend.database.config.config import get_db
 from backend.service.transaction_service_db import TransactionServiceDB
 from backend.api.models import (
-    TransactionResponse, TransactionCreate, TransactionUpdate,
-    TransactionFilter, TransactionImport
+    TransactionResponse, TransactionCreate, TransactionUpdate, TransactionImport
 )
 
 router = APIRouter(prefix="/api/transactions", tags=["transactions"])
@@ -216,7 +215,7 @@ async def search_transactions(query: str = Body(..., embed=True), db: Session = 
     transaction_service = TransactionServiceDB(db)
     return transaction_service.search_transactions(query)
 
-@router.get("/export")
+@router.get("/transactions/export")
 async def export_transactions(
     format: str = Query("csv", description="Export format: csv or json"),
     account_id: Optional[str] = Query(None, description="Filter by account ID"),
