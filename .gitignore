@@ -40,3 +40,13 @@ htmlcov/
 # Database
 *.sqlite3
 *.db
+
+# Design assets and screens
+docs/screens/
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.psd
+*.ai
+*.sketch

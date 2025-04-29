@@ -1,16 +1,91 @@
 {
     "feature": "Account Management",
-    "acceptane_criteria": "",
-    "completion_status": "No",
+    "acceptance_criteria": "Users can add, view, edit, and delete different types of financial accounts (checking, savings, credit card, cash, investments) with appropriate details and categorization",
+    "completion_status": "Yes",
     "user_stories": [
       {
-        "title": "",
-        "acceptane_criteria": "",
-        "completion_status": "No",
+        "title": "View Accounts List",
+        "acceptance_criteria": "As a user, I want to view a list of all my financial accounts so that I can see my overall financial portfolio",
+        "completion_status": "Yes",
         "tasks": [
-          { "task": "", "completion_status": "Yes" }
+          { "task": "Create account list UI component", "completion_status": "Yes" },
+          { "task": "Create account API endpoint to fetch accounts", "completion_status": "Yes" },
+          { "task": "Create account service with dummy data", "completion_status": "Yes" },
+          { "task": "Add unit tests for account service", "completion_status": "Yes" },
+          { "task": "Add unit tests for account API", "completion_status": "Yes" }
+        ]
+      },
+      {
+        "title": "Add New Account",
+        "acceptance_criteria": "As a user, I want to add new financial accounts so that I can track all my finances in one place",
+        "completion_status": "Yes",
+        "tasks": [
+          { "task": "Create account form UI component", "completion_status": "Yes" },
+          { "task": "Create API endpoint to add accounts", "completion_status": "Yes" },
+          { "task": "Update account service to handle adding accounts", "completion_status": "Yes" },
+          { "task": "Add unit tests for adding accounts", "completion_status": "Yes" },
+          { "task": "Add unit tests for account form API", "completion_status": "Yes" }
+        ]
+      },
+      {
+        "title": "Edit Account",
+        "acceptance_criteria": "As a user, I want to edit account details so that I can update information or correct errors",
+        "completion_status": "Yes",
+        "tasks": [
+          { "task": "Create edit account UI component", "completion_status": "Yes" },
+          { "task": "Create API endpoint to update accounts", "completion_status": "Yes" },
+          { "task": "Update account service to handle editing accounts", "completion_status": "Yes" },
+          { "task": "Add unit tests for editing accounts", "completion_status": "Yes" },
+          { "task": "Add unit tests for edit account API", "completion_status": "Yes" }
+        ]
+      },
+      {
+        "title": "Delete Account",
+        "acceptance_criteria": "As a user, I want to delete accounts so that I can remove accounts I no longer use",
+        "completion_status": "Yes",
+        "tasks": [
+          { "task": "Add delete functionality to account list UI", "completion_status": "Yes" },
+          { "task": "Create API endpoint to delete accounts", "completion_status": "Yes" },
+          { "task": "Update account service to handle deleting accounts", "completion_status": "Yes" },
+          { "task": "Add unit tests for deleting accounts", "completion_status": "Yes" },
+          { "task": "Add unit tests for delete account API", "completion_status": "Yes" }
+        ]
+      },
+      {
+        "title": "Categorize Accounts",
+        "acceptance_criteria": "As a user, I want to categorize my accounts by type and institution so that I can organize them logically",
+        "completion_status": "Yes",
+        "tasks": [
+          { "task": "Create account type and institution selection UI components", "completion_status": "Yes" },
+          { "task": "Create API endpoints to fetch account types and institutions", "completion_status": "Yes" },
+          { "task": "Create services for account types and institutions with dummy data", "completion_status": "Yes" },
+          { "task": "Update account service to handle categorization", "completion_status": "Yes" },
+          { "task": "Add unit tests for account categorization", "completion_status": "Yes" },
+          { "task": "Add unit tests for account types and institutions API", "completion_status": "Yes" }
+        ]
+      },
+      {
+        "title": "View Account Details",
+        "acceptance_criteria": "As a user, I want to view detailed information about a specific account so that I can see its current status and history",
+        "completion_status": "Yes",
+        "tasks": [
+          { "task": "Create account detail UI component", "completion_status": "Yes" },
+          { "task": "Create API endpoint to fetch account details", "completion_status": "Yes" },
+          { "task": "Update account service to provide detailed account information", "completion_status": "Yes" },
+          { "task": "Add unit tests for account details", "completion_status": "Yes" },
+          { "task": "Add unit tests for account detail API", "completion_status": "Yes" }
+        ]
+      },
+      {
+        "title": "Track Account Balances",
+        "acceptance_criteria": "As a user, I want to track the current balance of each account so that I know how much money I have",
+        "completion_status": "Yes",
+        "tasks": [
+          { "task": "Add balance display to account list and detail UI", "completion_status": "Yes" },
+          { "task": "Update account service to calculate and track balances", "completion_status": "Yes" },
+          { "task": "Add unit tests for balance tracking", "completion_status": "Yes" },
+          { "task": "Add unit tests for balance API", "completion_status": "Yes" }
         ]
       }
     ]
 }
-      

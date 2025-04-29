@@ -10,8 +10,11 @@ This document outlines the high-level features planned for the WealthTrackr appl
 - Track balances and sync with bank APIs (future integration with Plaid or manual import).
 
 ## 2. Track Transactions
-- Import and view transactions
-- Categorize transactions
+- Import transactions via CSV or JSON.
+- View all transactions.
+- List all transactions grouped by account and date.
+- Auto-categorize by payee and type.
 - Edit and delete entries
-- Filter and search
+- Manual transaction entry and editing.
+- Search, filter, and sort transactions.
 

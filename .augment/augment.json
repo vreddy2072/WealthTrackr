@@ -3,6 +3,12 @@
     "language": "TypeScript, Python",
     "frameworks": ["Vite", "React", "FastAPI", "SQLAlchemy"],
     "uiLibrary": "shadcn/ui",
+    "Shell Commands": [
+      "When generating terminal commands for Windows or PowerShell, use ';' to separate commands instead of '&&'.",
+      "Avoid using Bash-specific syntax unless explicitly requested.",
+      "Open only 2 Terminal windows: one for frontend and one for backend.",
+      "No need to kill and restart the server. Vite has Hot Module Replacement (HMR) built in. Same with FastAPI backend server."
+    ],
     "codingStandards": {
       "architecture": "Loosely coupled: UI → API → Service → ORM → Database",
       "testing": "Follow TDD; implement unit and integration tests after each layer",
@@ -16,12 +22,14 @@
         "Each task must also contain a Yes/No completion_status flag to track progress. When all the tasks are completed, validate user story acceptance criteria and update the user story’s completion_status to 'Yes'.",
         "Update the feature’s completion_status to 'Yes' when all its user stories and their tasks are marked complete. Validate the feature’s acceptance criteria.",
         "Use a consistent structure when writing JSON tracking files. Treat these files as a project control ledger.",
-        "Do not proceed to the next user story until the current one is implemented and marked complete."
-        ],  
+        "Do not proceed to the next user story until the current user story is implemented all the layers and marked complete."
+        ],
       "Folder Structure": [
+        "Organize new files into folders rather than directly placing them in frontend or backend folders.",
         "Get my approval before creating any new folders under C:/projects/WealthTrackr/backend and subfolders under it.",
-        "Do not create any new folders directly under main project folder C:/projects/WealthTrackr"
-      ],  
+        "Do not create any new folders directly under main project folder C:/projects/WealthTrackr",
+        "Never commit screen designs or image assets to the repository. These should be stored in docs/screens/ which is excluded from git."
+      ],
       "Frontend": [
         "Use Vite for the frontend with React and shadcn/ui for components.",
         "Use useContext + useReducer for state management.",
@@ -60,4 +68,3 @@
       "https://sqlalchemy.org/"
     ]
   }
-  
