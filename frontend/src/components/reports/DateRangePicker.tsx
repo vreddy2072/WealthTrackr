@@ -11,7 +11,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { forwardRef } from "react";
+import { forwardRef, useState, useEffect } from "react";
 
 interface DateRangePickerProps {
   dateRange: DateRange;
@@ -23,6 +23,22 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
   { dateRange, setDateRange, className },
   ref
 ) => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    // Initial check
+    checkIfMobile();
+
+    // Add event listener for window resize
+    window.addEventListener('resize', checkIfMobile);
+
+    // Cleanup
+    return () => window.removeEventListener('resize', checkIfMobile);
+  }, []);
   return (
     <div ref={ref} className={cn("grid gap-2", className)}>
       <Popover>
@@ -31,7 +47,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
             id="date"
             variant={"outline"}
             className={cn(
-              "w-[300px] justify-start text-left font-normal",
+              "w-full sm:w-[300px] justify-start text-left font-normal",
               !dateRange && "text-muted-foreground"
             )}
           >
@@ -50,14 +66,14 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
+        <PopoverContent className="w-auto p-0 z-50" align="start" side="bottom">
           <Calendar
             initialFocus
             mode="range"
             defaultMonth={dateRange?.from}
             selected={dateRange}
             onSelect={setDateRange}
-            numberOfMonths={2}
+            numberOfMonths={isMobile ? 1 : 2}
           />
         </PopoverContent>
       </Popover>
