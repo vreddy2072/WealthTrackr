@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  LineChart, 
-  Line, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend, 
-  ResponsiveContainer 
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer
 } from 'recharts';
 import { format, parseISO } from 'date-fns';
 import { Card, CardContent } from '@/components/ui/card';
@@ -26,10 +26,10 @@ interface NetWorthDataPoint {
   net_worth: number;
 }
 
-const NetWorthChart: React.FC<NetWorthChartProps> = ({ 
-  startDate, 
-  endDate, 
-  interval = 'month' 
+const NetWorthChart: React.FC<NetWorthChartProps> = ({
+  startDate,
+  endDate,
+  interval = 'month'
 }) => {
   const [data, setData] = useState<NetWorthDataPoint[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -37,23 +37,29 @@ const NetWorthChart: React.FC<NetWorthChartProps> = ({
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!startDate || !endDate) {
+        return;
+      }
+
       setLoading(true);
       setError(null);
-      
+
       try {
         // Construct the API URL with query parameters
         const params = new URLSearchParams();
-        if (startDate) params.append('start_date', startDate);
-        if (endDate) params.append('end_date', endDate);
-        if (interval) params.append('interval', interval);
-        
+        params.append('start_date', startDate);
+        params.append('end_date', endDate);
+        params.append('interval', interval);
+
+        console.log(`Fetching net worth history with params: ${params.toString()}`);
         const response = await fetch(`http://localhost:8000/api/reports/net-worth-history?${params.toString()}`);
-        
+
         if (!response.ok) {
           throw new Error(`Failed to fetch net worth history: ${response.statusText}`);
         }
-        
+
         const jsonData = await response.json();
+        console.log('Received net worth history data:', jsonData);
         setData(jsonData);
       } catch (err) {
         console.error('Error fetching net worth history:', err);
@@ -62,7 +68,7 @@ const NetWorthChart: React.FC<NetWorthChartProps> = ({
         setLoading(false);
       }
     };
-    
+
     fetchData();
   }, [startDate, endDate, interval]);
 
@@ -118,10 +124,10 @@ const NetWorthChart: React.FC<NetWorthChartProps> = ({
       >
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="date" />
-        <YAxis 
+        <YAxis
           tickFormatter={(value) => `$${value.toLocaleString()}`}
         />
-        <Tooltip 
+        <Tooltip
           formatter={(value) => [`$${Number(value).toLocaleString()}`, 'Net Worth']}
         />
         <Legend />
