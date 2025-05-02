@@ -11,15 +11,18 @@ import {
 } from 'recharts';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, ChevronDown } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { accountsApi } from '@/lib/api';
-import { format } from 'date-fns';
+import { format, addMonths, isBefore, isAfter, startOfMonth, endOfMonth, parseISO } from 'date-fns';
 
 interface MonthlySummaryProps {
   year: number;
   month: number;
   accountId?: string;
+  startDate?: string;
+  endDate?: string;
+  onMonthYearChange?: (year: number, month: number) => void;
 }
 
 interface MonthlySummaryData {
@@ -41,13 +44,72 @@ interface CategoryData {
 const MonthlySummary: React.FC<MonthlySummaryProps> = ({
   year,
   month,
-  accountId
+  accountId,
+  startDate,
+  endDate,
+  onMonthYearChange
 }) => {
   const [data, setData] = useState<MonthlySummaryData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedAccount, setSelectedAccount] = useState<string>('');
   const [accounts, setAccounts] = useState<any[]>([]);
+  const [selectedYear, setSelectedYear] = useState<number>(year);
+  const [selectedMonth, setSelectedMonth] = useState<number>(month);
+  const [availableMonths, setAvailableMonths] = useState<{year: number, month: number, label: string}[]>([]);
+
+  // Generate a list of months within the date range
+  useEffect(() => {
+    if (startDate && endDate) {
+      try {
+        const start = startOfMonth(parseISO(startDate));
+        const end = endOfMonth(parseISO(endDate));
+        const months = [];
+
+        let currentDate = start;
+        while (isBefore(currentDate, end) || currentDate.getTime() === end.getTime()) {
+          const currentYear = currentDate.getFullYear();
+          const currentMonth = currentDate.getMonth() + 1; // 1-12
+          const monthName = format(currentDate, 'MMMM yyyy');
+
+          months.push({
+            year: currentYear,
+            month: currentMonth,
+            label: monthName
+          });
+
+          currentDate = addMonths(currentDate, 1);
+        }
+
+        // Sort in reverse chronological order (newest first)
+        months.sort((a, b) => {
+          if (a.year !== b.year) return b.year - a.year;
+          return b.month - a.month;
+        });
+
+        setAvailableMonths(months);
+
+        // Only set default month if we haven't already selected one
+        // or if the current selection is outside the available range
+        if (months.length > 0 && (
+          !selectedYear ||
+          !selectedMonth ||
+          !months.some(m => m.year === selectedYear && m.month === selectedMonth)
+        )) {
+          const latestMonth = months[0];
+          setSelectedYear(latestMonth.year);
+          setSelectedMonth(latestMonth.month);
+
+          // Call the callback if provided
+          if (onMonthYearChange) {
+            onMonthYearChange(latestMonth.year, latestMonth.month);
+          }
+        }
+      } catch (err) {
+        console.error('Error processing date range:', err);
+      }
+    }
+  }, [startDate, endDate, onMonthYearChange, selectedYear, selectedMonth]);
 
   useEffect(() => {
     const fetchAccounts = async () => {
@@ -64,16 +126,21 @@ const MonthlySummary: React.FC<MonthlySummaryProps> = ({
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!selectedYear || !selectedMonth) {
+        return;
+      }
+
       setLoading(true);
       setError(null);
 
       try {
         // Construct the API URL with query parameters
         const params = new URLSearchParams();
-        params.append('year', year.toString());
-        params.append('month', month.toString());
+        params.append('year', selectedYear.toString());
+        params.append('month', selectedMonth.toString());
         if (selectedAccount) params.append('account_id', selectedAccount);
 
+        console.log(`Fetching monthly summary with params: ${params.toString()}`);
         const response = await fetch(`http://localhost:8000/api/reports/monthly-summary?${params.toString()}`);
 
         if (!response.ok) {
@@ -81,6 +148,7 @@ const MonthlySummary: React.FC<MonthlySummaryProps> = ({
         }
 
         const jsonData = await response.json();
+        console.log('Received monthly summary data:', jsonData);
         setData(jsonData);
       } catch (err) {
         console.error('Error fetching monthly summary:', err);
@@ -91,10 +159,23 @@ const MonthlySummary: React.FC<MonthlySummaryProps> = ({
     };
 
     fetchData();
-  }, [year, month, selectedAccount]);
+  }, [selectedYear, selectedMonth, selectedAccount]);
 
   const handleAccountChange = (value: string) => {
     setSelectedAccount(value === 'all' ? '' : value);
+  };
+
+  const handleMonthChange = (value: string) => {
+    const [yearStr, monthStr] = value.split('-');
+    const newYear = parseInt(yearStr);
+    const newMonth = parseInt(monthStr);
+    setSelectedYear(newYear);
+    setSelectedMonth(newMonth);
+
+    // Call the callback if provided
+    if (onMonthYearChange) {
+      onMonthYearChange(newYear, newMonth);
+    }
   };
 
   const chartData = [
@@ -103,48 +184,34 @@ const MonthlySummary: React.FC<MonthlySummaryProps> = ({
     { name: 'Net Change', value: data?.net_change || 0 }
   ];
 
-  if (loading) {
-    return (
-      <div className="w-full h-full flex flex-col gap-4">
-        <Skeleton className="h-[300px] w-full" />
-      </div>
-    );
-  }
+  // Always render the account selector and month/year display
+  const monthName = new Date(selectedYear, selectedMonth - 1).toLocaleString('default', { month: 'long' });
 
-  if (error) {
-    return (
-      <Alert variant="destructive">
-        <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Error</AlertTitle>
-        <AlertDescription>
-          Failed to load monthly summary: {error}
-        </AlertDescription>
-      </Alert>
-    );
-  }
+  const headerSection = (
+    <div className="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <h3 className="text-lg font-medium">
+        Summary for {monthName} {selectedYear}
+      </h3>
+      <div className="flex flex-col sm:flex-row gap-2">
+        <Select
+          value={`${selectedYear}-${selectedMonth}`}
+          onValueChange={handleMonthChange}
+          disabled={availableMonths.length === 0}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select Month" />
+          </SelectTrigger>
+          <SelectContent>
+            {availableMonths.map((item) => (
+              <SelectItem key={`${item.year}-${item.month}`} value={`${item.year}-${item.month}`}>
+                {item.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
-  if (!data) {
-    return (
-      <Alert>
-        <AlertCircle className="h-4 w-4" />
-        <AlertTitle>No Data</AlertTitle>
-        <AlertDescription>
-          No monthly summary data available for the selected month.
-        </AlertDescription>
-      </Alert>
-    );
-  }
-
-  const monthName = new Date(year, month - 1).toLocaleString('default', { month: 'long' });
-
-  return (
-    <div className="w-full">
-      <div className="mb-4 flex justify-between items-center">
-        <h3 className="text-lg font-medium">
-          Summary for {monthName} {year}
-        </h3>
         <Select value={selectedAccount} onValueChange={handleAccountChange}>
-          <SelectTrigger className="w-[250px]">
+          <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="All Accounts" />
           </SelectTrigger>
           <SelectContent>
@@ -157,6 +224,53 @@ const MonthlySummary: React.FC<MonthlySummaryProps> = ({
           </SelectContent>
         </Select>
       </div>
+    </div>
+  );
+
+  if (loading) {
+    return (
+      <div className="w-full h-full">
+        {headerSection}
+        <div className="flex flex-col gap-4">
+          <Skeleton className="h-[300px] w-full" />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-full h-full">
+        {headerSection}
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>
+            Failed to load monthly summary: {error}
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="w-full h-full">
+        {headerSection}
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>No Data</AlertTitle>
+          <AlertDescription>
+            No monthly summary data available for the selected month.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full">
+      {headerSection}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
