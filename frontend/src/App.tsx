@@ -6,6 +6,7 @@ import { Skeleton } from './components/ui/skeleton';
 import Layout from './components/layout/Layout';
 import AccountsPage from './pages/AccountsPage';
 import TransactionsPage from './pages/TransactionsPage';
+import ReportsPage from './pages/ReportsPage';
 import { accountsApi, transactionsApi } from './lib/api';
 import './App.css';
 
@@ -30,7 +31,7 @@ function App() {
         } />
         <Route path="/reports" element={
           <Layout>
-            <ComingSoon title="Reports" />
+            <ReportsPage />
           </Layout>
         } />
         <Route path="/budget" element={

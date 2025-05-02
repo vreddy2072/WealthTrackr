@@ -106,3 +106,27 @@ class TransactionImport(BaseModel):
     """Model for importing transactions."""
     account_id: str
     transactions: List[TransactionCreate]
+
+
+class NetWorthHistoryResponse(BaseModel):
+    """Model for net worth history data point."""
+    date: datetime
+    net_worth: float
+
+
+class SpendingByCategoryResponse(BaseModel):
+    """Model for spending by category data point."""
+    category: str
+    amount: float
+    percentage: float
+
+
+class MonthlySummaryResponse(BaseModel):
+    """Model for monthly summary report."""
+    year: int
+    month: int
+    income: float
+    expenses: float
+    net_change: float
+    top_income_categories: List[SpendingByCategoryResponse]
+    top_expense_categories: List[SpendingByCategoryResponse]

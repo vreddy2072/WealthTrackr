@@ -1,0 +1,67 @@
+{
+    "feature": "Reports & Dashboards",
+    "acceptance_criteria": "Users can view financial reports and dashboards showing net worth over time, spending by category, and monthly summaries. Reports can be downloaded as PDF/CSV.",
+    "completion_status": "Partial",
+    "user_stories": [
+      {
+        "title": "Net Worth Over Time",
+        "acceptance_criteria": "Users can view a chart showing their net worth over time.",
+        "completion_status": "Yes",
+        "tasks": [
+          { "task": "Create API endpoint for retrieving net worth history data", "completion_status": "Yes" },
+          { "task": "Implement service methods for calculating net worth over time", "completion_status": "Yes" },
+          { "task": "Create UI components for displaying net worth chart", "completion_status": "Yes" },
+          { "task": "Implement date range selection for the chart", "completion_status": "Yes" },
+          { "task": "Write unit tests for API and service layers", "completion_status": "No" }
+        ]
+      },
+      {
+        "title": "Spending by Category",
+        "acceptance_criteria": "Users can view a pie chart showing their spending by category.",
+        "completion_status": "Yes",
+        "tasks": [
+          { "task": "Create API endpoint for retrieving spending by category data", "completion_status": "Yes" },
+          { "task": "Implement service methods for calculating spending by category", "completion_status": "Yes" },
+          { "task": "Create UI components for displaying category spending pie chart", "completion_status": "Yes" },
+          { "task": "Implement date range and account filters", "completion_status": "Yes" },
+          { "task": "Write unit tests for API and service layers", "completion_status": "No" }
+        ]
+      },
+      {
+        "title": "Monthly Summary Reports",
+        "acceptance_criteria": "Users can view monthly summary reports showing income, expenses, and balance changes.",
+        "completion_status": "Yes",
+        "tasks": [
+          { "task": "Create API endpoint for retrieving monthly summary data", "completion_status": "Yes" },
+          { "task": "Implement service methods for generating monthly summaries", "completion_status": "Yes" },
+          { "task": "Create UI components for displaying monthly summary reports", "completion_status": "Yes" },
+          { "task": "Implement month/year selection for the reports", "completion_status": "Yes" },
+          { "task": "Write unit tests for API and service layers", "completion_status": "No" }
+        ]
+      },
+      {
+        "title": "Download Reports",
+        "acceptance_criteria": "Users can download reports as PDF or CSV files.",
+        "completion_status": "No",
+        "tasks": [
+          { "task": "Create API endpoints for generating downloadable reports", "completion_status": "No" },
+          { "task": "Implement service methods for formatting report data for PDF/CSV", "completion_status": "No" },
+          { "task": "Create UI components for selecting and downloading reports", "completion_status": "No" },
+          { "task": "Implement file generation and download functionality", "completion_status": "No" },
+          { "task": "Write unit tests for API and service layers", "completion_status": "No" }
+        ]
+      },
+      {
+        "title": "Dashboard Overview",
+        "acceptance_criteria": "Users can view a dashboard with key financial metrics and charts.",
+        "completion_status": "Partial",
+        "tasks": [
+          { "task": "Create API endpoints for retrieving dashboard data", "completion_status": "Yes" },
+          { "task": "Implement service methods for calculating dashboard metrics", "completion_status": "Yes" },
+          { "task": "Create UI components for the dashboard layout", "completion_status": "Yes" },
+          { "task": "Implement interactive dashboard widgets and charts", "completion_status": "Partial" },
+          { "task": "Write unit tests for API and service layers", "completion_status": "No" }
+        ]
+      }
+    ]
+}
