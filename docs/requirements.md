@@ -8,6 +8,7 @@ This document outlines the high-level features planned for the WealthTrackr appl
 - Add and manage multiple account types: checking, savings, credit card, cash, and investments.
 - Categorize by account type and institution.
 - Track balances and sync with bank APIs (future integration with Plaid or manual import).
+- Connect to online banking accounts to automatically download transactions and update balances.
 
 ## 2. Track Transactions
 - Import transactions via CSV or JSON.

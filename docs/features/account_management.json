@@ -1,7 +1,7 @@
 {
     "feature": "Account Management",
     "acceptance_criteria": "Users can add, view, edit, and delete different types of financial accounts (checking, savings, credit card, cash, investments) with appropriate details and categorization",
-    "completion_status": "Yes",
+    "completion_status": "Partial",
     "user_stories": [
       {
         "title": "View Accounts List",
@@ -85,6 +85,23 @@
           { "task": "Update account service to calculate and track balances", "completion_status": "Yes" },
           { "task": "Add unit tests for balance tracking", "completion_status": "Yes" },
           { "task": "Add unit tests for balance API", "completion_status": "Yes" }
+        ]
+      },
+      {
+        "title": "Connect to Online Banking",
+        "acceptance_criteria": "As a user, I want to connect to my online banking accounts so that I can automatically download transactions and update balances",
+        "completion_status": "No",
+        "tasks": [
+          { "task": "Research and select a banking API integration service (Plaid, Yodlee, etc.)", "completion_status": "Yes" },
+          { "task": "Create UI for connecting to online banking accounts", "completion_status": "No" },
+          { "task": "Implement secure credential handling for banking connections", "completion_status": "No" },
+          { "task": "Create API endpoints for initiating and managing bank connections", "completion_status": "No" },
+          { "task": "Implement service layer for bank API integration", "completion_status": "No" },
+          { "task": "Create transaction synchronization functionality", "completion_status": "No" },
+          { "task": "Implement automatic balance updates", "completion_status": "No" },
+          { "task": "Add error handling for connection issues", "completion_status": "No" },
+          { "task": "Add unit tests for bank connection services", "completion_status": "No" },
+          { "task": "Add unit tests for bank connection API", "completion_status": "No" }
         ]
       }
     ]
