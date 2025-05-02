@@ -4,7 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import NetWorthChart from '@/components/reports/NetWorthChart';
 import SpendingByCategory from '@/components/reports/SpendingByCategory';
 import MonthlySummary from '@/components/reports/MonthlySummary';
-import { DateRangePicker } from '@/components/reports/DateRangePicker';
+import { SeparateDateRangePicker } from '@/components/reports/SeparateDateRangePicker';
+import ExportReportDialog from '@/components/reports/ExportReportDialog';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 
@@ -16,29 +17,36 @@ const ReportsPage: React.FC = () => {
     from: new Date(new Date().setFullYear(new Date().getFullYear() - 1)),
     to: new Date(),
   });
+  const [activeTab, setActiveTab] = useState<string>('net-worth');
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState<boolean>(false);
+  const [selectedMonthYear, setSelectedMonthYear] = useState<{year: number, month: number}>({
+    year: new Date().getFullYear(),
+    month: new Date().getMonth() + 1
+  });
 
   const handleDownloadReport = () => {
-    // This will be implemented in the "Download Reports" user story
-    console.log('Download report');
+    setIsExportDialogOpen(true);
   };
 
   return (
     <div className="container mx-auto py-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+      <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-6">
         <h1 className="text-3xl font-bold">Reports & Dashboards</h1>
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full md:w-auto">
-          <DateRangePicker
-            dateRange={dateRange}
-            setDateRange={setDateRange}
-          />
-          <Button onClick={handleDownloadReport} className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row items-start gap-4 w-full md:w-auto">
+          <div className="flex-grow">
+            <SeparateDateRangePicker
+              dateRange={dateRange}
+              setDateRange={setDateRange}
+            />
+          </div>
+          <Button onClick={handleDownloadReport} className="flex items-center gap-2 mt-auto">
             <Download size={16} />
             Download Report
           </Button>
         </div>
       </div>
 
-      <Tabs defaultValue="net-worth" className="w-full">
+      <Tabs defaultValue="net-worth" className="w-full" onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-3 mb-8">
           <TabsTrigger value="net-worth">Net Worth</TabsTrigger>
           <TabsTrigger value="spending">Spending by Category</TabsTrigger>
@@ -91,11 +99,25 @@ const ReportsPage: React.FC = () => {
               <MonthlySummary
                 year={dateRange.to?.getFullYear() || new Date().getFullYear()}
                 month={(dateRange.to?.getMonth() || new Date().getMonth()) + 1}
+                startDate={dateRange.from?.toISOString() || ''}
+                endDate={dateRange.to?.toISOString() || ''}
+                onMonthYearChange={(year, month) => setSelectedMonthYear({year, month})}
               />
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Export Report Dialog */}
+      <ExportReportDialog
+        isOpen={isExportDialogOpen}
+        onClose={() => setIsExportDialogOpen(false)}
+        startDate={dateRange.from}
+        endDate={dateRange.to}
+        activeTab={activeTab}
+        selectedYear={selectedMonthYear.year}
+        selectedMonth={selectedMonthYear.month}
+      />
     </div>
   );
 };
