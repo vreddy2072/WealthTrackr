@@ -3,7 +3,8 @@ import { Account, accountsApi } from '../../lib/api';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
-import { ArrowLeft, Edit, Trash2, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2, AlertCircle, Link } from 'lucide-react';
+import BankConnectionModal from './BankConnectionModal';
 import { formatCurrency, formatDate } from '../../lib/utils';
 import { useAccounts } from '../../lib/contexts/AccountContext';
 
@@ -18,21 +19,27 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({ accountId, onBack, onEd
   const [account, setAccount] = useState<Account | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isBankConnectionModalOpen, setIsBankConnectionModalOpen] = useState(false);
+
+  const fetchAccount = async () => {
+    try {
+      setLoading(true);
+      const data = await accountsApi.getById(accountId);
+      setAccount(data);
+      setLoading(false);
+    } catch (err) {
+      setError('Failed to load account details. Please try again.');
+      console.error('Error fetching account:', err);
+      setLoading(false);
+    }
+  };
+
+  const handleBankConnectionSuccess = () => {
+    // Refresh the account data to show the updated connection status
+    fetchAccount();
+  };
 
   useEffect(() => {
-    const fetchAccount = async () => {
-      try {
-        setLoading(true);
-        const data = await accountsApi.getById(accountId);
-        setAccount(data);
-        setLoading(false);
-      } catch (err) {
-        setError('Failed to load account details. Please try again.');
-        console.error('Error fetching account:', err);
-        setLoading(false);
-      }
-    };
-
     fetchAccount();
   }, [accountId]);
 
@@ -180,7 +187,26 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({ accountId, onBack, onEd
             <p className="text-sm">{formatDate(account.updated_at)}</p>
           </div>
         </div>
+
+        <div className="pt-4 border-t">
+          <h3 className="text-sm font-medium text-muted-foreground mb-3">Online Banking</h3>
+          <Button variant="outline" size="sm" onClick={() => {
+            console.log('Connect to Online Banking button clicked');
+            setIsBankConnectionModalOpen(true);
+            console.log('isBankConnectionModalOpen set to true');
+          }}>
+            <Link className="mr-2 h-4 w-4" /> Connect to Online Banking
+          </Button>
+        </div>
       </CardContent>
+
+      {/* Bank Connection Modal */}
+      <BankConnectionModal
+        isOpen={isBankConnectionModalOpen}
+        onClose={() => setIsBankConnectionModalOpen(false)}
+        accountId={accountId}
+        onSuccess={handleBankConnectionSuccess}
+      />
     </Card>
   );
 };

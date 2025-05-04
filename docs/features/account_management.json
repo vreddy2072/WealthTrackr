@@ -89,6 +89,7 @@
       },
       {
         "title": "Connect to Online Banking",
+        "title": "Connect to Online Banking",
         "acceptance_criteria": "As a user, I want to connect to my online banking accounts so that I can automatically download transactions and update balances",
         "completion_status": "No",
         "tasks": [

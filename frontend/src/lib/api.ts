@@ -410,3 +410,175 @@ export const accountsApi = {
     return response.json();
   },
 };
+
+/**
+ * API client for reports
+ */
+export const reportsApi = {
+  // Add reports API methods here
+};
+
+/**
+ * Bank connection type definition
+ */
+export interface BankConnection {
+  id: string;
+  institution_id: string;
+  status: string;
+  last_sync_at?: string;
+  error_message?: string;
+  created_at: string;
+  updated_at: string;
+  institution: Institution;
+  connected_accounts: string[];
+}
+
+/**
+ * Bank connection account link type definition
+ */
+export interface BankConnectionAccount {
+  id: string;
+  bank_connection_id: string;
+  account_id: string;
+  external_account_id: string;
+  last_sync_at?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * API client for bank connections
+ */
+export const bankConnectionsApi = {
+  /**
+   * Get all bank connections
+   */
+  getAll: async (institutionId?: string): Promise<BankConnection[]> => {
+    const url = institutionId
+      ? `${API_BASE_URL}/bank-connections?institution_id=${institutionId}`
+      : `${API_BASE_URL}/bank-connections`;
+
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch bank connections: ${response.statusText}`);
+    }
+    return response.json();
+  },
+
+  /**
+   * Get a bank connection by ID
+   */
+  getById: async (connectionId: string): Promise<BankConnection> => {
+    const response = await fetch(`${API_BASE_URL}/bank-connections/${connectionId}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch bank connection: ${response.statusText}`);
+    }
+    return response.json();
+  },
+
+  /**
+   * Create a new bank connection
+   */
+  create: async (institutionId: string, publicToken: string): Promise<BankConnection> => {
+    const response = await fetch(`${API_BASE_URL}/bank-connections`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        institution_id: institutionId,
+        public_token: publicToken
+      }),
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to create bank connection: ${response.statusText}`);
+    }
+    return response.json();
+  },
+
+  /**
+   * Update a bank connection
+   */
+  update: async (connectionId: string, data: { status?: string; error_message?: string }): Promise<BankConnection> => {
+    const response = await fetch(`${API_BASE_URL}/bank-connections/${connectionId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to update bank connection: ${response.statusText}`);
+    }
+    return response.json();
+  },
+
+  /**
+   * Delete a bank connection
+   */
+  delete: async (connectionId: string): Promise<void> => {
+    const response = await fetch(`${API_BASE_URL}/bank-connections/${connectionId}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to delete bank connection: ${response.statusText}`);
+    }
+  },
+
+  /**
+   * Link an account to a bank connection
+   */
+  linkAccount: async (connectionId: string, accountId: string, externalAccountId: string): Promise<BankConnectionAccount> => {
+    const response = await fetch(`${API_BASE_URL}/bank-connections/${connectionId}/accounts`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        bank_connection_id: connectionId,
+        account_id: accountId,
+        external_account_id: externalAccountId
+      }),
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to link account to bank connection: ${response.statusText}`);
+    }
+    return response.json();
+  },
+
+  /**
+   * Unlink an account from a bank connection
+   */
+  unlinkAccount: async (connectionId: string, accountId: string): Promise<void> => {
+    const response = await fetch(`${API_BASE_URL}/bank-connections/${connectionId}/accounts/${accountId}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to unlink account from bank connection: ${response.statusText}`);
+    }
+  },
+
+  /**
+   * Sync transactions for an account
+   */
+  syncAccountTransactions: async (connectionId: string, accountId: string): Promise<any> => {
+    const response = await fetch(`${API_BASE_URL}/bank-connections/${connectionId}/accounts/${accountId}/sync`, {
+      method: 'POST',
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to sync account transactions: ${response.statusText}`);
+    }
+    return response.json();
+  },
+
+  /**
+   * Get a Plaid link token
+   */
+  getPlaidLinkToken: async (): Promise<{ link_token: string; expiration: string }> => {
+    const response = await fetch(`${API_BASE_URL}/bank-connections/plaid/link-token`);
+    if (!response.ok) {
+      throw new Error(`Failed to get Plaid link token: ${response.statusText}`);
+    }
+    return response.json();
+  }
+};

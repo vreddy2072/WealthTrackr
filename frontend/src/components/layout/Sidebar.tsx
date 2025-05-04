@@ -10,7 +10,8 @@ import {
   Menu,
   X,
   ChevronRight,
-  DollarSign
+  DollarSign,
+  Link as LinkIcon
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '../ui/button';
@@ -37,6 +38,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className }) => {
     { path: '/accounts', label: 'Accounts', icon: <CreditCard size={20} /> },
     { path: '/transactions', label: 'Transactions', icon: <Receipt size={20} /> },
     { path: '/reports', label: 'Reports', icon: <BarChart4 size={20} /> },
+    { path: '/bank-connections', label: 'Bank Connections', icon: <LinkIcon size={20} /> },
     { path: '/budget', label: 'Budget', icon: <PiggyBank size={20} /> },
     { path: '/goals', label: 'Goals', icon: <Target size={20} /> },
   ];

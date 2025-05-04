@@ -21,6 +21,7 @@ const Layout: React.FC<LayoutProps> = ({ children, className }) => {
     if (path === '/reports') return 'Reports';
     if (path === '/budget') return 'Budget';
     if (path === '/goals') return 'Goals';
+    if (path === '/bank-connections') return 'Bank Connections';
     return 'WealthTrackr';
   };
 

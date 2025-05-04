@@ -121,6 +121,63 @@ class SpendingByCategoryResponse(BaseModel):
     percentage: float
 
 
+# Bank Connection Models
+class BankConnectionBase(BaseModel):
+    """Base model for bank connection data."""
+    institution_id: str
+
+
+class BankConnectionCreate(BankConnectionBase):
+    """Model for creating a new bank connection."""
+    public_token: str
+
+
+class BankConnectionUpdate(BaseModel):
+    """Model for updating a bank connection."""
+    status: Optional[str] = None
+    error_message: Optional[str] = None
+
+
+class BankConnectionResponse(BankConnectionBase):
+    """Model for bank connection response."""
+    id: str
+    status: str
+    last_sync_at: Optional[datetime] = None
+    error_message: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+    institution: InstitutionResponse
+    connected_accounts: List[str] = []
+
+    class Config:
+        """Pydantic model configuration."""
+        from_attributes = True
+
+
+class BankConnectionAccountBase(BaseModel):
+    """Base model for bank connection account data."""
+    bank_connection_id: str
+    account_id: str
+    external_account_id: str
+
+
+class BankConnectionAccountCreate(BankConnectionAccountBase):
+    """Model for creating a new bank connection account."""
+    pass
+
+
+class BankConnectionAccountResponse(BankConnectionAccountBase):
+    """Model for bank connection account response."""
+    id: str
+    last_sync_at: Optional[datetime] = None
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        """Pydantic model configuration."""
+        from_attributes = True
+
+
 class MonthlySummaryResponse(BaseModel):
     """Model for monthly summary report."""
     year: int
