@@ -24,3 +24,9 @@ This document outlines the high-level features planned for the WealthTrackr appl
 - Spending by category/pie chart
 - Monthly summary reports
 - Download reports as PDF/CSV
+
+### 3.4 Spending Plan (Budgeting)
+- Monthly income and expense planning.
+- Recurring bills, subscriptions, and one-time expenses.
+- Budget vs actual comparison.
+- Visual charts showing spending trends and limits.
