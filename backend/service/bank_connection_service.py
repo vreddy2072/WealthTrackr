@@ -281,11 +281,78 @@ class BankConnectionService:
             link.last_sync_at = now
             self.db.commit()
 
-        # In a real implementation, we would create transactions based on the data
-        # from the bank. For now, we'll just return a success message.
+        # Generate some mock transactions for demonstration purposes
+        # In a real implementation, we would fetch these from Plaid
+        from backend.service.transaction_service import TransactionService
+        transaction_service = TransactionService(self.db)
+
+        # Generate 5-10 random transactions from the last 30 days
+        import random
+        from datetime import timedelta
+
+        num_transactions = random.randint(5, 10)
+        transactions_created = 0
+
+        # Common merchants by category
+        merchants = {
+            "Food": ["Grocery Store", "Restaurant", "Coffee Shop", "Fast Food"],
+            "Shopping": ["Department Store", "Online Retailer", "Electronics Store"],
+            "Transportation": ["Gas Station", "Ride Share", "Public Transit"],
+            "Entertainment": ["Movie Theater", "Streaming Service", "Concert Venue"],
+            "Bills": ["Utility Company", "Internet Provider", "Phone Company"],
+        }
+
+        # Create transactions
+        for _ in range(num_transactions):
+            # Random date in the last 30 days
+            days_ago = random.randint(0, 30)
+            transaction_date = now - timedelta(days=days_ago)
+
+            # Random category and merchant
+            category = random.choice(list(merchants.keys()))
+            merchant = random.choice(merchants[category])
+
+            # Random amount (negative for expenses, positive for income)
+            is_income = random.random() < 0.2  # 20% chance of being income
+            amount = random.uniform(5, 200)
+            if not is_income:
+                amount = -amount
+
+            # Create the transaction
+            transaction_data = {
+                "account_id": account_id,
+                "date": transaction_date.date().isoformat(),
+                "amount": round(amount, 2),
+                "payee": merchant,
+                "category": "Income" if is_income else category,
+                "description": f"Transaction at {merchant}",
+                "is_reconciled": False
+            }
+
+            try:
+                transaction_service.create_transaction(transaction_data)
+                transactions_created += 1
+            except Exception as e:
+                print(f"Error creating transaction: {e}")
+
+        # Update account balance based on transactions
+        from backend.service.account_service import AccountService
+        account_service = AccountService(self.db)
+
+        # Get all transactions for this account
+        transactions = transaction_service.get_transactions_by_account(account_id)
+
+        # Calculate new balance
+        new_balance = sum(t.amount for t in transactions)
+
+        # Update account balance
+        account_service.update_account(account_id, {"balance": new_balance})
+
         return {
             "success": True,
-            "message": "Transactions synced successfully",
+            "message": f"Synced {transactions_created} transactions successfully",
+            "transactions_created": transactions_created,
+            "new_balance": new_balance,
             "last_sync_at": now.isoformat()
         }
 
@@ -298,7 +365,39 @@ class BankConnectionService:
         """
         # In a real implementation, we would use the Plaid API to create a link token.
         # For now, we'll simulate this with a mock response.
+
+        # Note: In a real implementation, you would need to:
+        # 1. Set up a Plaid developer account
+        # 2. Install the plaid-python library
+        # 3. Initialize the Plaid client with your credentials
+        # 4. Call client.link_token_create() with appropriate parameters
+
+        # For this simulation, we're returning a fake token that the frontend
+        # will recognize as a sandbox token
         return {
             "link_token": f"link-sandbox-{uuid.uuid4().hex}",
             "expiration": (datetime.now(timezone.utc) + timedelta(minutes=30)).isoformat()
         }
+
+    def get_supported_institutions(self) -> List[Dict[str, Any]]:
+        """
+        Get a list of supported financial institutions.
+
+        In a real implementation, this would come from Plaid's institutions endpoint.
+        For now, we'll return a mock list of popular banks.
+
+        Returns:
+            List[Dict[str, Any]]: List of supported institutions
+        """
+        return [
+            {"id": "ins_1", "name": "Chase", "logo": "chase.png"},
+            {"id": "ins_2", "name": "Bank of America", "logo": "bofa.png"},
+            {"id": "ins_3", "name": "Wells Fargo", "logo": "wellsfargo.png"},
+            {"id": "ins_4", "name": "Citibank", "logo": "citi.png"},
+            {"id": "ins_5", "name": "Capital One", "logo": "capitalone.png"},
+            {"id": "ins_6", "name": "American Express", "logo": "amex.png"},
+            {"id": "ins_7", "name": "Discover", "logo": "discover.png"},
+            {"id": "ins_8", "name": "US Bank", "logo": "usbank.png"},
+            {"id": "ins_9", "name": "PNC Bank", "logo": "pnc.png"},
+            {"id": "ins_10", "name": "TD Bank", "logo": "tdbank.png"},
+        ]

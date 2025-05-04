@@ -33,10 +33,10 @@ async def get_bank_connections(
     """
     bank_connection_service = BankConnectionService(db)
     connections = bank_connection_service.get_all_connections()
-    
+
     if institution_id:
         connections = [c for c in connections if c["institution_id"] == institution_id]
-    
+
     return connections
 
 @router.get("/{connection_id}", response_model=BankConnectionResponse)
@@ -56,10 +56,10 @@ async def get_bank_connection(
     """
     bank_connection_service = BankConnectionService(db)
     connection = bank_connection_service.get_connection_by_id(connection_id)
-    
+
     if not connection:
         raise HTTPException(status_code=404, detail=f"Bank connection with ID {connection_id} not found")
-    
+
     return connection
 
 @router.post("/", response_model=BankConnectionResponse)
@@ -78,7 +78,7 @@ async def create_bank_connection(
         BankConnectionResponse: The created bank connection.
     """
     bank_connection_service = BankConnectionService(db)
-    
+
     try:
         connection = bank_connection_service.create_connection(
             connection_data.public_token,
@@ -106,15 +106,15 @@ async def update_bank_connection(
         BankConnectionResponse: The updated bank connection.
     """
     bank_connection_service = BankConnectionService(db)
-    
+
     # Convert Pydantic model to dict, excluding None values
     update_data = {k: v for k, v in connection_data.dict().items() if v is not None}
-    
+
     connection = bank_connection_service.update_connection(connection_id, update_data)
-    
+
     if not connection:
         raise HTTPException(status_code=404, detail=f"Bank connection with ID {connection_id} not found")
-    
+
     return connection
 
 @router.delete("/{connection_id}")
@@ -133,12 +133,12 @@ async def delete_bank_connection(
         dict: A success message.
     """
     bank_connection_service = BankConnectionService(db)
-    
+
     success = bank_connection_service.delete_connection(connection_id)
-    
+
     if not success:
         raise HTTPException(status_code=404, detail=f"Bank connection with ID {connection_id} not found")
-    
+
     return {"message": f"Bank connection with ID {connection_id} deleted successfully"}
 
 @router.post("/{connection_id}/accounts", response_model=BankConnectionAccountResponse)
@@ -159,11 +159,11 @@ async def link_account_to_connection(
         BankConnectionAccountResponse: The created bank connection account link.
     """
     bank_connection_service = BankConnectionService(db)
-    
+
     # Ensure the connection ID in the path matches the one in the request body
     if link_data.bank_connection_id != connection_id:
         raise HTTPException(status_code=400, detail="Connection ID in path does not match the one in the request body")
-    
+
     try:
         link = bank_connection_service.link_account_to_connection(
             link_data.bank_connection_id,
@@ -192,12 +192,12 @@ async def unlink_account_from_connection(
         dict: A success message.
     """
     bank_connection_service = BankConnectionService(db)
-    
+
     success = bank_connection_service.unlink_account_from_connection(connection_id, account_id)
-    
+
     if not success:
         raise HTTPException(status_code=404, detail=f"Link between connection {connection_id} and account {account_id} not found")
-    
+
     return {"message": f"Account {account_id} unlinked from connection {connection_id} successfully"}
 
 @router.post("/{connection_id}/accounts/{account_id}/sync")
@@ -218,12 +218,12 @@ async def sync_account_transactions(
         dict: The sync result.
     """
     bank_connection_service = BankConnectionService(db)
-    
+
     result = bank_connection_service.sync_account_transactions(connection_id, account_id)
-    
+
     if not result.get("success", False):
         raise HTTPException(status_code=400, detail=result.get("message", "Failed to sync transactions"))
-    
+
     return result
 
 @router.get("/plaid/link-token")
@@ -240,9 +240,30 @@ async def get_plaid_link_token(
         dict: The link token response.
     """
     bank_connection_service = BankConnectionService(db)
-    
+
     try:
         link_token = bank_connection_service.get_plaid_link_token()
         return link_token
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.get("/institutions")
+async def get_supported_institutions(
+    db: Session = Depends(get_db)
+):
+    """
+    Get a list of supported financial institutions.
+
+    Args:
+        db (Session): The database session.
+
+    Returns:
+        list: List of supported institutions.
+    """
+    bank_connection_service = BankConnectionService(db)
+
+    try:
+        institutions = bank_connection_service.get_supported_institutions()
+        return institutions
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
