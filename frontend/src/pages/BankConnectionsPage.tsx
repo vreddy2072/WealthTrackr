@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { BankConnection, bankConnectionsApi, accountsApi, Account } from '../lib/api';
+import { mockBankConnectionsApi, mockAccountsApi } from '../lib/mockApi';
+
+// Use mock APIs to avoid CORS issues
+const useMockApi = true;
+const api = {
+  bankConnections: useMockApi ? mockBankConnectionsApi : bankConnectionsApi,
+  accounts: useMockApi ? mockAccountsApi : accountsApi,
+};
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
@@ -19,15 +27,15 @@ const BankConnectionsPage: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       // Fetch bank connections
-      const connectionsData = await bankConnectionsApi.getAll();
+      const connectionsData = await api.bankConnections.getAll();
       setConnections(connectionsData);
-      
+
       // Fetch accounts
-      const accountsData = await accountsApi.getAll();
+      const accountsData = await api.accounts.getAll();
       setAccounts(accountsData);
-      
+
       setLoading(false);
     } catch (err) {
       setError('Failed to load bank connections. Please try again.');
@@ -43,16 +51,16 @@ const BankConnectionsPage: React.FC = () => {
   const handleSyncConnection = async (connectionId: string) => {
     try {
       setSyncingConnection(connectionId);
-      
+
       // Get all accounts linked to this connection
       const connection = connections.find(c => c.id === connectionId);
       if (!connection) return;
-      
+
       // Sync each account
       for (const accountId of connection.connected_accounts) {
-        await bankConnectionsApi.syncAccountTransactions(connectionId, accountId);
+        await api.bankConnections.syncAccountTransactions(connectionId, accountId);
       }
-      
+
       // Refresh the data
       await fetchData();
     } catch (err) {
@@ -67,9 +75,9 @@ const BankConnectionsPage: React.FC = () => {
     if (!window.confirm('Are you sure you want to disconnect this bank connection? This will remove automatic updates for all linked accounts.')) {
       return;
     }
-    
+
     try {
-      await bankConnectionsApi.delete(connectionId);
+      await api.bankConnections.delete(connectionId);
       await fetchData();
     } catch (err) {
       setError(`Failed to disconnect bank: ${err instanceof Error ? err.message : 'Unknown error'}`);
@@ -78,8 +86,15 @@ const BankConnectionsPage: React.FC = () => {
   };
 
   const handleConnectionSuccess = () => {
+    console.log('Connection success callback triggered');
     fetchData();
+    setIsBankConnectionModalOpen(false);
   };
+
+  // Log when the modal open state changes
+  useEffect(() => {
+    console.log('BankConnectionsPage - modal open state:', isBankConnectionModalOpen);
+  }, [isBankConnectionModalOpen]);
 
   const getConnectionStatusBadge = (status: string) => {
     switch (status.toLowerCase()) {
@@ -97,7 +112,7 @@ const BankConnectionsPage: React.FC = () => {
   const getAccountsForConnection = (connectionId: string) => {
     const connection = connections.find(c => c.id === connectionId);
     if (!connection) return [];
-    
+
     return accounts.filter(account => connection.connected_accounts.includes(account.id));
   };
 
@@ -118,9 +133,16 @@ const BankConnectionsPage: React.FC = () => {
     <div className="container mx-auto py-6 space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Bank Connections</h1>
-        <Button onClick={() => setIsBankConnectionModalOpen(true)}>
-          <Link className="mr-2 h-4 w-4" /> Connect a Bank
-        </Button>
+        {connections.length > 0 && (
+          <Button
+            onClick={() => {
+              console.log('Connect a Bank button clicked');
+              setIsBankConnectionModalOpen(true);
+            }}
+          >
+            <Link className="mr-2 h-4 w-4" /> Connect a Bank
+          </Button>
+        )}
       </div>
 
       {error && (
@@ -145,7 +167,12 @@ const BankConnectionsPage: React.FC = () => {
             <p className="text-center text-muted-foreground mb-4">
               You haven't connected any banks yet. Connect your bank to automatically import transactions.
             </p>
-            <Button onClick={() => setIsBankConnectionModalOpen(true)}>
+            <Button
+              onClick={() => {
+                console.log('Connect a Bank button clicked (empty state)');
+                setIsBankConnectionModalOpen(true);
+              }}
+            >
               Connect a Bank
             </Button>
           </CardContent>
@@ -154,7 +181,7 @@ const BankConnectionsPage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {connections.map((connection) => {
             const linkedAccounts = getAccountsForConnection(connection.id);
-            
+
             return (
               <Card key={connection.id}>
                 <CardHeader>
@@ -180,7 +207,7 @@ const BankConnectionsPage: React.FC = () => {
                   ) : (
                     <p className="text-sm text-muted-foreground">No accounts linked</p>
                   )}
-                  
+
                   {connection.error_message && (
                     <div className="mt-4 bg-red-50 p-3 rounded-md text-red-800 text-sm">
                       <p className="font-medium">Error</p>
@@ -220,8 +247,10 @@ const BankConnectionsPage: React.FC = () => {
           })}
         </div>
       )}
-      
-      {/* Bank Connection Modal */}
+
+
+
+      {/* Bank Connection Modal - Always render but control visibility with isOpen */}
       <BankConnectionModal
         isOpen={isBankConnectionModalOpen}
         onClose={() => setIsBankConnectionModalOpen(false)}
