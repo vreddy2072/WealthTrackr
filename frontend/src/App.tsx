@@ -7,6 +7,7 @@ import Layout from './components/layout/Layout';
 import AccountsPage from './pages/AccountsPage';
 import TransactionsPage from './pages/TransactionsPage';
 import ReportsPage from './pages/ReportsPage';
+import BankConnectionsPage from './pages/BankConnectionsPage';
 import { accountsApi, transactionsApi } from './lib/api';
 import './App.css';
 
@@ -42,6 +43,11 @@ function App() {
         <Route path="/goals" element={
           <Layout>
             <ComingSoon title="Goals" />
+          </Layout>
+        } />
+        <Route path="/bank-connections" element={
+          <Layout>
+            <BankConnectionsPage />
           </Layout>
         } />
       </Routes>
@@ -293,6 +299,9 @@ const HomePage = () => {
           </Link>
           <Link to="/reports">
             <Button variant="outline">View Reports</Button>
+          </Link>
+          <Link to="/bank-connections">
+            <Button variant="outline">Bank Connections</Button>
           </Link>
           <Link to="/budget">
             <Button variant="outline">Set Budget</Button>

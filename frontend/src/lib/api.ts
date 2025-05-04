@@ -2,7 +2,17 @@
  * API client for the WealthTrackr backend
  */
 
-const API_BASE_URL = 'http://localhost:8000/api';
+// Use the proxy configured in vite.config.ts
+export const API_BASE_URL = '/api';
+
+// Default fetch options to include CORS headers
+const defaultFetchOptions = {
+  mode: 'cors',
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  }
+};
 
 /**
  * Transaction interface
@@ -102,7 +112,7 @@ export const transactionsApi = {
    * Get all transactions
    */
   getAll: async (): Promise<Transaction[]> => {
-    const response = await fetch(`${API_BASE_URL}/transactions/`);
+    const response = await fetch(`${API_BASE_URL}/transactions/`, defaultFetchOptions);
     if (!response.ok) {
       throw new Error(`Failed to fetch transactions: ${response.statusText}`);
     }
@@ -120,7 +130,7 @@ export const transactionsApi = {
    * Get a specific transaction by ID
    */
   getById: async (id: string): Promise<Transaction> => {
-    const response = await fetch(`${API_BASE_URL}/transactions/${id}`);
+    const response = await fetch(`${API_BASE_URL}/transactions/${id}`, defaultFetchOptions);
     if (!response.ok) {
       throw new Error(`Failed to fetch transaction: ${response.statusText}`);
     }
@@ -144,10 +154,8 @@ export const transactionsApi = {
     };
 
     const response = await fetch(`${API_BASE_URL}/transactions/`, {
+      ...defaultFetchOptions,
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
       body: JSON.stringify(apiData),
     });
     if (!response.ok) {
@@ -173,10 +181,8 @@ export const transactionsApi = {
     if (transactionData.isReconciled !== undefined) apiData.is_reconciled = transactionData.isReconciled;
 
     const response = await fetch(`${API_BASE_URL}/transactions/${id}`, {
+      ...defaultFetchOptions,
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
       body: JSON.stringify(apiData),
     });
     if (!response.ok) {
@@ -195,6 +201,7 @@ export const transactionsApi = {
    */
   delete: async (id: string): Promise<void> => {
     const response = await fetch(`${API_BASE_URL}/transactions/${id}`, {
+      ...defaultFetchOptions,
       method: 'DELETE',
     });
     if (!response.ok) {
@@ -206,7 +213,7 @@ export const transactionsApi = {
    * Get all categories
    */
   getCategories: async (): Promise<string[]> => {
-    const response = await fetch(`${API_BASE_URL}/transactions/categories`);
+    const response = await fetch(`${API_BASE_URL}/transactions/categories`, defaultFetchOptions);
     if (!response.ok) {
       throw new Error(`Failed to fetch categories: ${response.statusText}`);
     }
@@ -227,10 +234,8 @@ export const transactionsApi = {
     };
 
     const response = await fetch(`${API_BASE_URL}/transactions/import`, {
+      ...defaultFetchOptions,
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
       body: JSON.stringify(apiData),
     });
 
@@ -280,7 +285,7 @@ export const accountsApi = {
    * Get all accounts
    */
   getAll: async (): Promise<Account[]> => {
-    const response = await fetch(`${API_BASE_URL}/accounts/`);
+    const response = await fetch(`${API_BASE_URL}/accounts/`, defaultFetchOptions);
     if (!response.ok) {
       throw new Error(`Failed to fetch accounts: ${response.statusText}`);
     }
@@ -291,7 +296,7 @@ export const accountsApi = {
    * Get accounts by type
    */
   getByType: async (type: string): Promise<Account[]> => {
-    const response = await fetch(`${API_BASE_URL}/accounts/?type=${encodeURIComponent(type)}`);
+    const response = await fetch(`${API_BASE_URL}/accounts/?type=${encodeURIComponent(type)}`, defaultFetchOptions);
     if (!response.ok) {
       throw new Error(`Failed to fetch accounts by type: ${response.statusText}`);
     }
@@ -302,7 +307,7 @@ export const accountsApi = {
    * Get accounts by institution
    */
   getByInstitution: async (institution: string): Promise<Account[]> => {
-    const response = await fetch(`${API_BASE_URL}/accounts/?institution=${encodeURIComponent(institution)}`);
+    const response = await fetch(`${API_BASE_URL}/accounts/?institution=${encodeURIComponent(institution)}`, defaultFetchOptions);
     if (!response.ok) {
       throw new Error(`Failed to fetch accounts by institution: ${response.statusText}`);
     }
@@ -313,7 +318,7 @@ export const accountsApi = {
    * Get a specific account by ID
    */
   getById: async (id: string): Promise<Account> => {
-    const response = await fetch(`${API_BASE_URL}/accounts/${id}`);
+    const response = await fetch(`${API_BASE_URL}/accounts/${id}`, defaultFetchOptions);
     if (!response.ok) {
       throw new Error(`Failed to fetch account: ${response.statusText}`);
     }
@@ -325,10 +330,8 @@ export const accountsApi = {
    */
   create: async (accountData: AccountCreateData): Promise<Account> => {
     const response = await fetch(`${API_BASE_URL}/accounts/`, {
+      ...defaultFetchOptions,
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
       body: JSON.stringify(accountData),
     });
     if (!response.ok) {
@@ -342,10 +345,8 @@ export const accountsApi = {
    */
   update: async (id: string, accountData: AccountUpdateData): Promise<Account> => {
     const response = await fetch(`${API_BASE_URL}/accounts/${id}`, {
+      ...defaultFetchOptions,
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
       body: JSON.stringify(accountData),
     });
     if (!response.ok) {
@@ -359,6 +360,7 @@ export const accountsApi = {
    */
   delete: async (id: string): Promise<void> => {
     const response = await fetch(`${API_BASE_URL}/accounts/${id}`, {
+      ...defaultFetchOptions,
       method: 'DELETE',
     });
     if (!response.ok) {
@@ -370,7 +372,7 @@ export const accountsApi = {
    * Get all account types
    */
   getAccountTypes: async (): Promise<AccountType[]> => {
-    const response = await fetch(`${API_BASE_URL}/accounts/types/all`);
+    const response = await fetch(`${API_BASE_URL}/accounts/types/all`, defaultFetchOptions);
     if (!response.ok) {
       throw new Error(`Failed to fetch account types: ${response.statusText}`);
     }
@@ -381,7 +383,7 @@ export const accountsApi = {
    * Get all financial institutions
    */
   getInstitutions: async (): Promise<Institution[]> => {
-    const response = await fetch(`${API_BASE_URL}/accounts/institutions/all`);
+    const response = await fetch(`${API_BASE_URL}/accounts/institutions/all`, defaultFetchOptions);
     if (!response.ok) {
       throw new Error(`Failed to fetch institutions: ${response.statusText}`);
     }
@@ -392,7 +394,7 @@ export const accountsApi = {
    * Get total balance across all accounts
    */
   getTotalBalance: async (): Promise<number> => {
-    const response = await fetch(`${API_BASE_URL}/accounts/stats/total-balance`);
+    const response = await fetch(`${API_BASE_URL}/accounts/stats/total-balance`, defaultFetchOptions);
     if (!response.ok) {
       throw new Error(`Failed to fetch total balance: ${response.statusText}`);
     }
@@ -403,10 +405,197 @@ export const accountsApi = {
    * Get net worth (assets minus liabilities)
    */
   getNetWorth: async (): Promise<number> => {
-    const response = await fetch(`${API_BASE_URL}/accounts/stats/net-worth`);
+    const response = await fetch(`${API_BASE_URL}/accounts/stats/net-worth`, defaultFetchOptions);
     if (!response.ok) {
       throw new Error(`Failed to fetch net worth: ${response.statusText}`);
     }
     return response.json();
   },
+};
+
+/**
+ * API client for reports
+ */
+export const reportsApi = {
+  // Add reports API methods here
+};
+
+/**
+ * Bank connection type definition
+ */
+export interface BankConnection {
+  id: string;
+  institution_id: string;
+  status: string;
+  last_sync_at?: string;
+  error_message?: string;
+  created_at: string;
+  updated_at: string;
+  institution: Institution;
+  connected_accounts: string[];
+}
+
+/**
+ * Bank connection account link type definition
+ */
+export interface BankConnectionAccount {
+  id: string;
+  bank_connection_id: string;
+  account_id: string;
+  external_account_id: string;
+  last_sync_at?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * API client for bank connections
+ */
+export const bankConnectionsApi = {
+  /**
+   * Get all bank connections
+   */
+  getAll: async (institutionId?: string): Promise<BankConnection[]> => {
+    const url = institutionId
+      ? `${API_BASE_URL}/bank-connections?institution_id=${institutionId}`
+      : `${API_BASE_URL}/bank-connections`;
+
+    const response = await fetch(url, defaultFetchOptions);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch bank connections: ${response.statusText}`);
+    }
+    return response.json();
+  },
+
+  /**
+   * Get a bank connection by ID
+   */
+  getById: async (connectionId: string): Promise<BankConnection> => {
+    const response = await fetch(`${API_BASE_URL}/bank-connections/${connectionId}`, defaultFetchOptions);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch bank connection: ${response.statusText}`);
+    }
+    return response.json();
+  },
+
+  /**
+   * Create a new bank connection
+   */
+  create: async (institutionId: string, publicToken: string): Promise<BankConnection> => {
+    const response = await fetch(`${API_BASE_URL}/bank-connections`, {
+      ...defaultFetchOptions,
+      method: 'POST',
+      body: JSON.stringify({
+        institution_id: institutionId,
+        public_token: publicToken
+      }),
+    });
+    if (!response.ok) {
+      // Try to get more detailed error information from the response
+      try {
+        const errorData = await response.json();
+        throw new Error(`Failed to create bank connection: ${errorData.detail || response.statusText}`);
+      } catch (e) {
+        // If we can't parse the error response, use the status text
+        throw new Error(`Failed to create bank connection: ${response.statusText}`);
+      }
+    }
+    return response.json();
+  },
+
+  /**
+   * Update a bank connection
+   */
+  update: async (connectionId: string, data: { status?: string; error_message?: string }): Promise<BankConnection> => {
+    const response = await fetch(`${API_BASE_URL}/bank-connections/${connectionId}`, {
+      ...defaultFetchOptions,
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to update bank connection: ${response.statusText}`);
+    }
+    return response.json();
+  },
+
+  /**
+   * Delete a bank connection
+   */
+  delete: async (connectionId: string): Promise<void> => {
+    const response = await fetch(`${API_BASE_URL}/bank-connections/${connectionId}`, {
+      ...defaultFetchOptions,
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to delete bank connection: ${response.statusText}`);
+    }
+  },
+
+  /**
+   * Link an account to a bank connection
+   */
+  linkAccount: async (connectionId: string, accountId: string, externalAccountId: string): Promise<BankConnectionAccount> => {
+    const response = await fetch(`${API_BASE_URL}/bank-connections/${connectionId}/accounts`, {
+      ...defaultFetchOptions,
+      method: 'POST',
+      body: JSON.stringify({
+        bank_connection_id: connectionId,
+        account_id: accountId,
+        external_account_id: externalAccountId
+      }),
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to link account to bank connection: ${response.statusText}`);
+    }
+    return response.json();
+  },
+
+  /**
+   * Unlink an account from a bank connection
+   */
+  unlinkAccount: async (connectionId: string, accountId: string): Promise<void> => {
+    const response = await fetch(`${API_BASE_URL}/bank-connections/${connectionId}/accounts/${accountId}`, {
+      ...defaultFetchOptions,
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to unlink account from bank connection: ${response.statusText}`);
+    }
+  },
+
+  /**
+   * Sync transactions for an account
+   */
+  syncAccountTransactions: async (connectionId: string, accountId: string): Promise<any> => {
+    const response = await fetch(`${API_BASE_URL}/bank-connections/${connectionId}/accounts/${accountId}/sync`, {
+      ...defaultFetchOptions,
+      method: 'POST',
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to sync account transactions: ${response.statusText}`);
+    }
+    return response.json();
+  },
+
+  /**
+   * Get a Plaid link token
+   */
+  getPlaidLinkToken: async (): Promise<{ link_token: string; expiration: string }> => {
+    const response = await fetch(`${API_BASE_URL}/bank-connections/plaid/link-token`, defaultFetchOptions);
+    if (!response.ok) {
+      throw new Error(`Failed to get Plaid link token: ${response.statusText}`);
+    }
+    return response.json();
+  },
+
+  /**
+   * Get supported financial institutions
+   */
+  getSupportedInstitutions: async (): Promise<Institution[]> => {
+    const response = await fetch(`${API_BASE_URL}/bank-connections/institutions`, defaultFetchOptions);
+    if (!response.ok) {
+      throw new Error(`Failed to get supported institutions: ${response.statusText}`);
+    }
+    return response.json();
+  }
 };

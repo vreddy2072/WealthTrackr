@@ -53,16 +53,21 @@ const SpendingByCategory: React.FC<SpendingByCategoryProps> = ({
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!startDate || !endDate) {
+        return;
+      }
+
       setLoading(true);
       setError(null);
 
       try {
         // Construct the API URL with query parameters
         const params = new URLSearchParams();
-        if (startDate) params.append('start_date', startDate);
-        if (endDate) params.append('end_date', endDate);
+        params.append('start_date', startDate);
+        params.append('end_date', endDate);
         if (selectedAccount) params.append('account_id', selectedAccount);
 
+        console.log(`Fetching spending data with params: ${params.toString()}`);
         const response = await fetch(`http://localhost:8000/api/reports/spending-by-category?${params.toString()}`);
 
         if (!response.ok) {
@@ -70,6 +75,7 @@ const SpendingByCategory: React.FC<SpendingByCategoryProps> = ({
         }
 
         const jsonData = await response.json();
+        console.log('Received spending data:', jsonData);
         setData(jsonData);
       } catch (err) {
         console.error('Error fetching spending data:', err);
@@ -86,55 +92,69 @@ const SpendingByCategory: React.FC<SpendingByCategoryProps> = ({
     setSelectedAccount(value === 'all' ? '' : value);
   };
 
+  // Always render the account selector at the top
+  const accountSelector = (
+    <div className="mb-4">
+      <Select value={selectedAccount} onValueChange={handleAccountChange}>
+        <SelectTrigger className="w-[250px]">
+          <SelectValue placeholder="All Accounts" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Accounts</SelectItem>
+          {accounts.map((account) => (
+            <SelectItem key={account.id} value={account.id}>
+              {account.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+
   if (loading) {
     return (
-      <div className="w-full h-full flex flex-col gap-4">
-        <Skeleton className="h-[300px] w-full" />
+      <div className="w-full h-full">
+        {accountSelector}
+        <div className="flex flex-col gap-4">
+          <Skeleton className="h-[300px] w-full" />
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <Alert variant="destructive">
-        <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Error</AlertTitle>
-        <AlertDescription>
-          Failed to load spending data: {error}
-        </AlertDescription>
-      </Alert>
+      <div className="w-full h-full">
+        {accountSelector}
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>
+            Failed to load spending data: {error}
+          </AlertDescription>
+        </Alert>
+      </div>
     );
   }
 
   if (data.length === 0) {
     return (
-      <Alert>
-        <AlertCircle className="h-4 w-4" />
-        <AlertTitle>No Data</AlertTitle>
-        <AlertDescription>
-          No spending data available for the selected date range.
-        </AlertDescription>
-      </Alert>
+      <div className="w-full h-full">
+        {accountSelector}
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>No Data</AlertTitle>
+          <AlertDescription>
+            No spending data available for the selected date range.
+          </AlertDescription>
+        </Alert>
+      </div>
     );
   }
 
   return (
     <div className="w-full h-full">
-      <div className="mb-4">
-        <Select value={selectedAccount} onValueChange={handleAccountChange}>
-          <SelectTrigger className="w-[250px]">
-            <SelectValue placeholder="All Accounts" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Accounts</SelectItem>
-            {accounts.map((account) => (
-              <SelectItem key={account.id} value={account.id}>
-                {account.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      {accountSelector}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-[300px]">
         <ResponsiveContainer width="100%" height="100%">
