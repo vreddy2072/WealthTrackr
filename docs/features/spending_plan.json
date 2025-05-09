@@ -1,0 +1,55 @@
+{
+  "feature": "Spending Plan - Budgeting",
+  "acceptance_criteria": "Users can plan monthly income and expenses, add recurring bills, subscriptions, and one-time expenses, compare budget vs actual spending, and view visual charts showing spending trends and limits.",
+  "completion_status": "No",
+  "user_stories": [
+    {
+      "title": "Set Up Monthly Budget",
+      "acceptance_criteria": "As a user, I want to set a monthly budget for income and expenses so I can plan my finances.",
+      "completion_status": "No",
+      "tasks": [
+        { "task": "Create UI for entering/editing monthly income and expense budgets", "completion_status": "No" },
+        { "task": "Create API endpoints for saving and retrieving budget data", "completion_status": "No" },
+        { "task": "Implement service layer with dummy data for budget CRUD", "completion_status": "No" },
+        { "task": "Add unit tests for UI, API, and service", "completion_status": "No" },
+        { "task": "Add integration test for budget creation and retrieval", "completion_status": "No" }
+      ]
+    },
+    {
+      "title": "Manage Recurring and One-Time Expenses",
+      "acceptance_criteria": "As a user, I want to add recurring bills, subscriptions, and one-time expenses to my budget.",
+      "completion_status": "No",
+      "tasks": [
+        { "task": "Create UI for adding/editing recurring and one-time expenses", "completion_status": "No" },
+        { "task": "Create API endpoints for managing recurring/one-time expenses", "completion_status": "No" },
+        { "task": "Implement service layer with dummy data for these expenses", "completion_status": "No" },
+        { "task": "Add unit tests for UI, API, and service", "completion_status": "No" },
+        { "task": "Add integration test for recurring/one-time expense management", "completion_status": "No" }
+      ]
+    },
+    {
+      "title": "Budget vs. Actual Comparison",
+      "acceptance_criteria": "As a user, I want to compare my planned budget with actual spending.",
+      "completion_status": "No",
+      "tasks": [
+        { "task": "Create UI to display budget vs. actual for each category", "completion_status": "No" },
+        { "task": "Create API endpoint to fetch actual spending data (use dummy data initially)", "completion_status": "No" },
+        { "task": "Implement service logic to calculate and return comparison data", "completion_status": "No" },
+        { "task": "Add unit tests for UI, API, and service", "completion_status": "No" },
+        { "task": "Add integration test for budget vs. actual comparison", "completion_status": "No" }
+      ]
+    },
+    {
+      "title": "Visual Charts for Spending Trends and Limits",
+      "acceptance_criteria": "As a user, I want to see charts of my spending trends and how they compare to my budget.",
+      "completion_status": "No",
+      "tasks": [
+        { "task": "Create UI components for visual charts (e.g., bar, line, pie)", "completion_status": "No" },
+        { "task": "Create API endpoint to provide chart data (dummy data initially)", "completion_status": "No" },
+        { "task": "Implement service logic to aggregate and format data for charts", "completion_status": "No" },
+        { "task": "Add unit tests for UI, API, and service", "completion_status": "No" },
+        { "task": "Add integration test for chart data", "completion_status": "No" }
+      ]
+    }
+  ]
+} 
