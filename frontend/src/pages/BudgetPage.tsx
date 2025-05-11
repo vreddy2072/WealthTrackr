@@ -5,6 +5,7 @@ import { Input } from '../components/ui/input';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '../components/ui/accordion';
 import { ChevronLeft, ChevronRight, Plus, MoreVertical, EyeOff } from 'lucide-react';
 import { budgetApi, BudgetItem, BudgetResponse } from '../lib/api';
+import { format, addMonths, parse } from 'date-fns';
 
 const sectionTypes = {
   income: ['Salary', 'Bonus', 'Other'],
@@ -24,8 +25,11 @@ function formatCurrency(amount: number) {
   return `${sign}$${Math.abs(amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
+const getMonthString = (date: Date) => format(date, 'MMMM yyyy');
+
 const BudgetPage: React.FC = () => {
-  const [month] = useState('May 2025');
+  const [monthDate, setMonthDate] = useState(() => new Date());
+  const [month, setMonth] = useState(getMonthString(new Date()));
   const [data, setData] = useState<BudgetResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [openForm, setOpenForm] = useState<string | null>(null);
@@ -33,7 +37,12 @@ const BudgetPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [editItem, setEditItem] = useState<{ section: string; item: BudgetItem } | null>(null);
 
-  // Fetch budget data on mount
+  // Update month string when monthDate changes
+  useEffect(() => {
+    setMonth(getMonthString(monthDate));
+  }, [monthDate]);
+
+  // Fetch budget data on month change
   useEffect(() => {
     setLoading(true);
     budgetApi.getBudget(month)
@@ -62,25 +71,25 @@ const BudgetPage: React.FC = () => {
     return { ...section, value: total };
   });
 
-  // Pie chart values (dummy for now)
-  const planned = 7800.0;
-  const other = 2370.53;
-  const available = 11183.81;
-  const total = planned + other + available;
-  const plannedPct = (planned / total) * 100;
-  const otherPct = (other / total) * 100;
-  const availablePct = (available / total) * 100;
-
   // Calculate summary values from data.items
   const income = data ? data.items.filter(i => i.section === 'income').reduce((sum, i) => sum + i.amount, 0) : 0;
   const bills = data ? data.items.filter(i => i.section === 'bills').reduce((sum, i) => sum + i.amount, 0) : 0;
   const subscriptions = data ? data.items.filter(i => i.section === 'subscriptions').reduce((sum, i) => sum + i.amount, 0) : 0;
   const investments = data ? data.items.filter(i => i.section === 'investments').reduce((sum, i) => sum + i.amount, 0) : 0;
   const plannedSpending = bills + subscriptions + investments;
-  const incomeAfterBills = income + plannedSpending;
-  const otherSpending = 0; // Placeholder, update if you have a way to calculate
-  const availableBudget = incomeAfterBills - otherSpending;
+  // For demo, treat any negative income as 'other spending' (customize as needed)
+  const otherSpending = data ? data.items.filter(i => i.section !== 'income' && i.amount < 0).reduce((sum, i) => sum + Math.abs(i.amount), 0) : 0;
+  const availableBudget = income - plannedSpending - otherSpending;
   const perDayBudget = availableBudget / 30;
+
+  // Pie chart values from real data
+  const planned = plannedSpending;
+  const other = otherSpending;
+  const available = availableBudget > 0 ? availableBudget : 0;
+  const total = planned + other + available;
+  const plannedPct = total > 0 ? (planned / total) * 100 : 0;
+  const otherPct = total > 0 ? (other / total) * 100 : 0;
+  const availablePct = total > 0 ? (available / total) * 100 : 0;
 
   // Handle add form submit
   const handleAdd = async (sectionKey: string) => {
@@ -91,6 +100,7 @@ const BudgetPage: React.FC = () => {
         amount: parseFloat(amount),
         type,
         section: sectionKey,
+        month,
       });
       setData(prev => prev ? { ...prev, items: [...prev.items, newItem] } : prev);
       setFormState(f => ({ ...f, [sectionKey]: { amount: '', type: '' } }));
@@ -182,18 +192,33 @@ const BudgetPage: React.FC = () => {
             </div>
           </div>
         </div>
+        {/* Month Selector */}
         <div className="flex items-center gap-2 bg-white rounded-lg px-4 py-2 shadow-sm">
-          <Button variant="ghost" size="icon" className="text-gray-500 hover:bg-gray-100"><ChevronLeft /></Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-gray-500 hover:bg-gray-100"
+            onClick={() => setMonthDate(prev => addMonths(prev, -1))}
+          >
+            <ChevronLeft />
+          </Button>
           <span className="font-medium text-gray-700 text-base">{month}</span>
-          <Button variant="ghost" size="icon" className="text-gray-500 hover:bg-gray-100"><ChevronRight /></Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-gray-500 hover:bg-gray-100"
+            onClick={() => setMonthDate(prev => addMonths(prev, 1))}
+          >
+            <ChevronRight />
+          </Button>
         </div>
       </div>
       <div className="flex gap-6">
         {/* Left Summary Panel */}
         <div className="w-56 flex-shrink-0 flex flex-col gap-4 sticky top-6 self-start" style={{ alignSelf: 'flex-start' }}>
           <Card className="rounded-lg shadow-none p-2 bg-[#f7f8fa] min-h-[90px] flex flex-col justify-center">
-            <div className="text-base font-extrabold text-[#222]">{formatCurrency(incomeAfterBills)}</div>
-            <div className="text-gray-500 text-xs mt-0.5">Income after bills & saving</div>
+            <div className="text-base font-extrabold text-[#222]">{formatCurrency(income)}</div>
+            <div className="text-gray-500 text-xs mt-0.5">Income</div>
           </Card>
           <Card className="rounded-lg shadow-none p-2 bg-[#f7f8fa] min-h-[90px] flex flex-col justify-center">
             <div className="text-sm font-bold text-[#a78bfa]">{formatCurrency(plannedSpending)}</div>

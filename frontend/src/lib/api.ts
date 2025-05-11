@@ -608,6 +608,14 @@ export interface BudgetItem {
   amount: number;
   type: string;
   section: string; // e.g., 'income', 'bills', etc.
+  month: string;
+}
+
+export interface BudgetItemCreate {
+  amount: number;
+  type: string;
+  section: string;
+  month: string;
 }
 
 export interface BudgetResponse {
@@ -624,7 +632,7 @@ export const budgetApi = {
     }
     return response.json();
   },
-  createBudget: async (item: Omit<BudgetItem, 'id'>): Promise<BudgetItem> => {
+  createBudget: async (item: BudgetItemCreate): Promise<BudgetItem> => {
     const response = await fetch(`${API_BASE_URL}/budget/`, {
       ...defaultFetchOptions,
       method: 'POST',

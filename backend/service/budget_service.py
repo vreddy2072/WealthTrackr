@@ -1,47 +1,33 @@
 from typing import List, Optional
+from sqlalchemy.orm import Session
 from backend.models.budget import BudgetItem, BudgetItemCreate, BudgetResponse
+from backend.database.repositories.budget_repository import BudgetRepository
 
-# Dummy in-memory data
-_dummy_budget = {
-    "May 2025": [
-        BudgetItem(id=1, amount=37882.4, type="Salary", section="income"),
-        BudgetItem(id=2, amount=-14947.11, type="Rent", section="bills"),
-        BudgetItem(id=3, amount=-80.95, type="Streaming", section="subscriptions"),
-        BudgetItem(id=4, amount=-1500.0, type="Stocks", section="investments"),
-    ]
-}
-
-
-def get_budget(month: Optional[str] = None) -> BudgetResponse:
+def get_budget(db: Session, month: Optional[str] = None) -> BudgetResponse:
     m = month or "May 2025"
-    items = _dummy_budget.get(m, [])
-    return BudgetResponse(month=m, items=items)
+    repo = BudgetRepository(db)
+    items = repo.get_budget_items_by_month(m)
+    # Convert ORM objects to Pydantic models
+    pydantic_items = [BudgetItem.model_validate(item) for item in items]
+    return BudgetResponse(month=m, items=pydantic_items)
 
+def create_budget(db: Session, item: BudgetItemCreate) -> BudgetItem:
+    repo = BudgetRepository(db)
+    item_data = item.dict()
+    new_item = repo.add_budget_item(item_data)
+    return new_item
 
-def create_budget(item: BudgetItemCreate) -> BudgetItem:
-    month = "May 2025"
-    items = _dummy_budget.setdefault(month, [])
-    new_id = max([i.id for i in items] + [0]) + 1
-    budget_item = BudgetItem(id=new_id, amount=item.amount, type=item.type, section=item.section)
-    items.append(budget_item)
-    return budget_item
+def update_budget(db: Session, item_id: int, item: BudgetItem) -> BudgetItem:
+    repo = BudgetRepository(db)
+    update_data = item.dict(exclude_unset=True)
+    updated = repo.update_budget_item(item_id, update_data)
+    if not updated:
+        raise ValueError("Item not found")
+    return updated
 
-
-def update_budget(item_id: int, item: BudgetItem) -> BudgetItem:
-    month = "May 2025"
-    items = _dummy_budget.get(month, [])
-    for idx, i in enumerate(items):
-        if i.id == item_id:
-            items[idx] = item
-            return item
-    raise ValueError("Item not found")
-
-
-def delete_budget(item_id: int):
-    month = "May 2025"
-    items = _dummy_budget.get(month, [])
-    for idx, i in enumerate(items):
-        if i.id == item_id:
-            del items[idx]
-            return {"ok": True}
-    raise ValueError("Item not found") 
+def delete_budget(db: Session, item_id: int):
+    repo = BudgetRepository(db)
+    success = repo.delete_budget_item(item_id)
+    if not success:
+        raise ValueError("Item not found")
+    return {"ok": True} 
