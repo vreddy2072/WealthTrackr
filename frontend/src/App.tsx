@@ -8,6 +8,7 @@ import AccountsPage from './pages/AccountsPage';
 import TransactionsPage from './pages/TransactionsPage';
 import ReportsPage from './pages/ReportsPage';
 import BankConnectionsPage from './pages/BankConnectionsPage';
+import BudgetPage from './pages/BudgetPage';
 import { accountsApi, transactionsApi } from './lib/api';
 import './App.css';
 
@@ -37,7 +38,7 @@ function App() {
         } />
         <Route path="/budget" element={
           <Layout>
-            <ComingSoon title="Budget" />
+            <BudgetPage />
           </Layout>
         } />
         <Route path="/goals" element={

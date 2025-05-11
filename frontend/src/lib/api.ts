@@ -599,3 +599,68 @@ export const bankConnectionsApi = {
     return response.json();
   }
 };
+
+/**
+ * Budget API types
+ */
+export interface BudgetItem {
+  id: number;
+  amount: number;
+  type: string;
+  section: string; // e.g., 'income', 'bills', etc.
+  month: string;
+}
+
+export interface BudgetItemCreate {
+  amount: number;
+  type: string;
+  section: string;
+  month: string;
+}
+
+export interface BudgetResponse {
+  month: string;
+  items: BudgetItem[];
+}
+
+export const budgetApi = {
+  getBudget: async (month?: string): Promise<BudgetResponse> => {
+    const url = month ? `${API_BASE_URL}/budget/?month=${encodeURIComponent(month)}` : `${API_BASE_URL}/budget/`;
+    const response = await fetch(url, defaultFetchOptions);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch budget: ${response.statusText}`);
+    }
+    return response.json();
+  },
+  createBudget: async (item: BudgetItemCreate): Promise<BudgetItem> => {
+    const response = await fetch(`${API_BASE_URL}/budget/`, {
+      ...defaultFetchOptions,
+      method: 'POST',
+      body: JSON.stringify(item),
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to create budget item: ${response.statusText}`);
+    }
+    return response.json();
+  },
+  updateBudget: async (id: number, item: BudgetItem): Promise<BudgetItem> => {
+    const response = await fetch(`${API_BASE_URL}/budget/${id}`, {
+      ...defaultFetchOptions,
+      method: 'PUT',
+      body: JSON.stringify(item),
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to update budget item: ${response.statusText}`);
+    }
+    return response.json();
+  },
+  deleteBudget: async (id: number): Promise<void> => {
+    const response = await fetch(`${API_BASE_URL}/budget/${id}`, {
+      ...defaultFetchOptions,
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to delete budget item: ${response.statusText}`);
+    }
+  },
+};
